@@ -1,0 +1,2972 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>CSS Quest — 設計師的 CSS 冒險</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ───────── CSS Variables ───────── */
+:root {
+  --bg: #0F172A;
+  --bg2: #1E293B;
+  --bg3: #263145;
+  --primary: #38BDF8;
+  --primary-dim: rgba(56,189,248,0.15);
+  --success: #10B981;
+  --success-dim: rgba(16,185,129,0.15);
+  --error: #F43F5E;
+  --error-dim: rgba(244,63,94,0.15);
+  --warn: #FBBF24;
+  --warn-dim: rgba(251,191,36,0.15);
+  --text: #F8FAFC;
+  --text2: #94A3B8;
+  --text3: #64748B;
+  --border: rgba(148,163,184,0.12);
+  --border2: rgba(148,163,184,0.22);
+  --glow: 0 0 20px rgba(56,189,248,0.3);
+  --radius: 12px;
+  --radius-lg: 18px;
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-code: 'JetBrains Mono', monospace;
+}
+
+/* ───────── Reset ───────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-tap-highlight-color: transparent;
+}
+button { cursor: pointer; border: none; background: none; font-family: inherit; color: inherit; }
+input, textarea { font-family: var(--font-code); color: inherit; }
+* { -webkit-overflow-scrolling: touch; }
+
+/* ───────── Scrollbar ───────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg3); border-radius: 2px; }
+
+/* ───────── App Shell ───────── */
+#app { width: 100%; height: 100%; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+
+/* ───────── Screens ───────── */
+.screen { position: absolute; inset: 0; display: flex; flex-direction: column; overflow: hidden; opacity: 0; pointer-events: none; transition: opacity 0.35s ease; }
+.screen.active { opacity: 1; pointer-events: all; }
+
+/* ───────── Nav Bar ───────── */
+.nav {
+  flex-shrink: 0;
+  height: 54px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 16px;
+  background: rgba(15,23,42,0.8);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  z-index: 100;
+}
+.nav-logo {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, var(--primary), #818CF8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.nav-logo span { -webkit-text-fill-color: var(--text2); font-weight: 400; font-size: 13px; letter-spacing: 0; margin-left: 6px; }
+.nav-actions { display: flex; gap: 8px; align-items: center; }
+.nav-btn {
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  transition: all 0.2s;
+}
+.nav-btn:hover { border-color: var(--primary); background: var(--primary-dim); }
+.nav-back {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 13px; color: var(--text2);
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  transition: all 0.2s;
+}
+.nav-back:hover { color: var(--text); border-color: var(--border2); }
+
+/* ═══════════════════════════════
+   HOME SCREEN
+═══════════════════════════════ */
+#screen-home {
+  overflow-y: auto;
+  padding-bottom: 24px;
+}
+.home-hero {
+  padding: 32px 20px 24px;
+  position: relative;
+  overflow: hidden;
+}
+.home-hero::before {
+  content: '';
+  position: absolute;
+  top: -60px; right: -40px;
+  width: 280px; height: 280px;
+  background: radial-gradient(circle, rgba(56,189,248,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-greeting {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--primary);
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+.hero-title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.25;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+.hero-sub { color: var(--text2); font-size: 14px; line-height: 1.6; max-width: 320px; }
+
+/* Streak Card */
+.streak-card {
+  margin: 0 16px 16px;
+  background: linear-gradient(135deg, rgba(56,189,248,0.12), rgba(129,140,248,0.08));
+  border: 1px solid rgba(56,189,248,0.25);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  display: flex; align-items: center; gap: 16px;
+}
+.streak-icon { font-size: 36px; line-height: 1; }
+.streak-info { flex: 1; }
+.streak-num {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.5px;
+}
+.streak-label { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.streak-days { display: flex; gap: 4px; margin-top: 10px; }
+.streak-dot {
+  width: 26px; height: 26px;
+  border-radius: 6px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; color: var(--text3);
+  transition: all 0.2s;
+}
+.streak-dot.done { background: var(--primary-dim); border-color: var(--primary); color: var(--primary); }
+.streak-dot.today { background: var(--primary); color: var(--bg); box-shadow: var(--glow); }
+
+/* Stats Row */
+.stats-row {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 10px; padding: 0 16px 16px;
+}
+.stat-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 12px;
+  text-align: center;
+  transition: all 0.2s;
+}
+.stat-card:active { transform: scale(0.97); }
+.stat-num {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 4px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.5px;
+}
+.stat-lbl { font-size: 11px; color: var(--text2); }
+
+/* Section */
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 16px 10px;
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+.section-link { font-size: 12px; color: var(--primary); }
+
+/* Continue Card */
+.continue-card {
+  margin: 0 16px 20px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.continue-card:hover { border-color: var(--primary); transform: translateY(-1px); }
+.continue-card:active { transform: scale(0.98); }
+.continue-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.continue-icon {
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  background: var(--primary-dim);
+  border: 1px solid rgba(56,189,248,0.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+}
+.continue-meta { flex: 1; }
+.continue-chapter { font-size: 11px; color: var(--primary); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+.continue-name { font-size: 15px; font-weight: 600; margin-top: 2px; }
+.continue-badge {
+  background: var(--warn-dim);
+  border: 1px solid rgba(251,191,36,0.3);
+  color: var(--warn);
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+.progress-bar {
+  height: 6px;
+  background: var(--bg3);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), #818CF8);
+  border-radius: 99px;
+  transition: width 0.6s ease;
+}
+.progress-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--text2); }
+
+/* Chapter List */
+.chapter-list { padding: 0 16px; display: flex; flex-direction: column; gap: 8px; }
+.chapter-item {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.chapter-item:hover { border-color: var(--border2); transform: translateX(3px); }
+.chapter-item:active { transform: scale(0.98); }
+.chapter-item.locked { opacity: 0.45; cursor: not-allowed; }
+.chapter-num {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display);
+  font-size: 14px; font-weight: 700;
+  flex-shrink: 0;
+}
+.chapter-num.done { background: var(--success-dim); border-color: var(--success); color: var(--success); }
+.chapter-num.active { background: var(--primary-dim); border-color: var(--primary); color: var(--primary); }
+.chapter-info { flex: 1; min-width: 0; }
+.chapter-name { font-size: 14px; font-weight: 600; }
+.chapter-desc { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.chapter-tag {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.tag-done { background: var(--success-dim); color: var(--success); border: 1px solid rgba(16,185,129,0.3); }
+.tag-active { background: var(--primary-dim); color: var(--primary); border: 1px solid rgba(56,189,248,0.3); }
+.tag-locked { background: var(--bg3); color: var(--text3); border: 1px solid var(--border); }
+
+/* Weakness Panel */
+.weakness-panel {
+  margin: 0 16px 20px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+}
+.weakness-items { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.weakness-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  background: var(--bg3);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.weakness-item:hover { border-color: var(--warn); }
+.weakness-icon { font-size: 16px; }
+.weakness-text { flex: 1; font-size: 13px; }
+.weakness-btn {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: var(--warn-dim);
+  color: var(--warn);
+  border: 1px solid rgba(251,191,36,0.3);
+  font-weight: 600;
+  transition: all 0.2s;
+}
+.weakness-item:hover .weakness-btn { background: var(--warn); color: var(--bg); }
+
+/* Badges */
+.badges-scroll {
+  display: flex; gap: 10px;
+  padding: 0 16px 20px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.badges-scroll::-webkit-scrollbar { display: none; }
+.badge-card {
+  flex-shrink: 0;
+  width: 80px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 8px;
+  text-align: center;
+  transition: all 0.2s;
+}
+.badge-card.earned { border-color: rgba(251,191,36,0.4); background: rgba(251,191,36,0.05); }
+.badge-emoji { font-size: 28px; display: block; margin-bottom: 6px; }
+.badge-name { font-size: 10px; color: var(--text2); line-height: 1.3; }
+.badge-card.earned .badge-name { color: var(--warn); }
+.badge-card.locked-badge { opacity: 0.35; filter: grayscale(1); }
+
+/* ═══════════════════════════════
+   CHAPTER SELECT SCREEN
+═══════════════════════════════ */
+#screen-chapter { overflow-y: auto; }
+.level-grid {
+  padding: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+.level-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 14px;
+  cursor: pointer;
+  transition: all 0.25s;
+  position: relative;
+  overflow: hidden;
+}
+.level-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--primary);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.level-card:hover::before { opacity: 1; }
+.level-card:hover { border-color: var(--border2); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+.level-card:active { transform: scale(0.97); }
+.level-card.done::before { opacity: 1; background: var(--success); }
+.level-card.locked-card { opacity: 0.4; cursor: not-allowed; }
+.level-num {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.level-title { font-size: 13px; font-weight: 600; line-height: 1.4; margin-bottom: 6px; }
+.level-meta { display: flex; align-items: center; justify-content: space-between; }
+.level-diff {
+  display: flex; gap: 3px;
+}
+.diff-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--bg3); }
+.diff-dot.filled { background: var(--primary); }
+.level-status { font-size: 14px; }
+
+/* ═══════════════════════════════
+   GAME SCREEN
+═══════════════════════════════ */
+#screen-game {
+  display: flex;
+  flex-direction: column;
+}
+.game-nav {
+  flex-shrink: 0;
+  height: 54px;
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 14px;
+  background: rgba(15,23,42,0.9);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+.game-progress-wrap { flex: 1; }
+.game-progress-track {
+  height: 6px;
+  background: var(--bg3);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.game-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), #818CF8);
+  border-radius: 99px;
+  transition: width 0.5s ease;
+}
+.game-level-label {
+  font-size: 11px;
+  color: var(--text2);
+  margin-bottom: 4px;
+  display: flex; justify-content: space-between;
+}
+.game-lives { display: flex; gap: 4px; }
+.life-icon { font-size: 14px; transition: all 0.3s; }
+.life-icon.lost { filter: grayscale(1); opacity: 0.35; transform: scale(0.85); }
+
+/* Game Body */
+.game-body {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Preview Area */
+.preview-area {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 14px 0;
+  gap: 8px;
+}
+.preview-tabs {
+  display: flex; gap: 6px;
+  align-items: center;
+}
+.preview-tab {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px; font-weight: 600;
+  border: 1px solid var(--border);
+  background: var(--bg3);
+  color: var(--text2);
+  transition: all 0.2s;
+}
+.preview-tab.active {
+  background: var(--primary-dim);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.preview-compare-btn {
+  margin-left: auto;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  transition: all 0.2s;
+}
+.preview-compare-btn.active { border-color: var(--warn); color: var(--warn); background: var(--warn-dim); }
+
+.previews-container {
+  display: flex; gap: 8px;
+}
+.preview-box {
+  flex: 1;
+  height: 130px;
+  background: #fff;
+  border-radius: var(--radius);
+  border: 2px solid var(--border);
+  overflow: hidden;
+  position: relative;
+  transition: border-color 0.3s;
+}
+.preview-box.target-box { border-color: rgba(16,185,129,0.4); }
+.preview-box.live-box { border-color: rgba(56,189,248,0.4); }
+.preview-box.match { border-color: var(--success); box-shadow: 0 0 16px rgba(16,185,129,0.3); }
+.preview-box.mismatch { border-color: var(--error); }
+.preview-label {
+  position: absolute;
+  top: 6px; left: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  z-index: 10;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.preview-label.target-lbl { background: rgba(16,185,129,0.9); color: #fff; }
+.preview-label.live-lbl { background: rgba(56,189,248,0.9); color: #111; }
+.preview-iframe, .preview-sandbox {
+  width: 100%; height: 100%;
+  border: none;
+  transform-origin: top left;
+}
+
+/* Task Area */
+.task-area {
+  flex-shrink: 0;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.task-header { display: flex; align-items: flex-start; gap: 10px; }
+.task-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: var(--warn-dim);
+  border: 1px solid rgba(251,191,36,0.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.task-content { flex: 1; }
+.task-title { font-size: 11px; color: var(--primary); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+.task-desc { font-size: 14px; font-weight: 500; margin-top: 2px; line-height: 1.5; }
+.task-hint {
+  display: flex; align-items: flex-start; gap: 6px;
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: rgba(251,191,36,0.07);
+  border: 1px solid rgba(251,191,36,0.15);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.5;
+}
+.hint-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+.hint-toggle {
+  font-size: 11px;
+  color: var(--warn);
+  margin-top: 4px;
+  display: inline-block;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.hint-text { display: none; margin-top: 4px; color: var(--warn); }
+.hint-text.visible { display: block; }
+
+/* Editor Area */
+.editor-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+.editor-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 14px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+}
+.editor-label {
+  font-family: var(--font-code);
+  font-size: 11px;
+  color: var(--text3);
+  display: flex; align-items: center; gap: 6px;
+}
+.editor-actions { display: flex; gap: 6px; }
+.editor-action-btn {
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 12px; font-weight: 600;
+  border: 1px solid var(--border);
+  background: var(--bg3);
+  color: var(--text2);
+  transition: all 0.2s;
+}
+.editor-action-btn.primary {
+  background: var(--primary);
+  color: #0F172A;
+  border-color: var(--primary);
+}
+.editor-action-btn.primary:hover { background: #7DD3FC; }
+.editor-action-btn:not(.primary):hover { border-color: var(--border2); color: var(--text); }
+
+/* Code Editor */
+.code-editor-wrap {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: #090f1c;
+}
+.code-lines {
+  position: absolute;
+  top: 0; left: 0;
+  width: 44px; height: 100%;
+  background: rgba(0,0,0,0.3);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  padding-top: 12px;
+  pointer-events: none;
+}
+.code-line-num {
+  height: 22px;
+  display: flex; align-items: center; justify-content: flex-end;
+  padding-right: 10px;
+  font-family: var(--font-code);
+  font-size: 11px;
+  color: var(--text3);
+  flex-shrink: 0;
+}
+.code-input {
+  position: absolute;
+  top: 0; left: 44px; right: 0; bottom: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-family: var(--font-code);
+  font-size: 13px;
+  line-height: 22px;
+  padding: 12px 16px;
+  resize: none;
+  caret-color: var(--primary);
+  tab-size: 2;
+  white-space: pre;
+  overflow-wrap: normal;
+  overflow-x: auto;
+  overflow-y: auto;
+  width: calc(100% - 44px);
+}
+/* Syntax highlight overlay — handled by JS */
+.code-highlight {
+  position: absolute;
+  top: 0; left: 44px; right: 0; bottom: 0;
+  pointer-events: none;
+  font-family: var(--font-code);
+  font-size: 13px;
+  line-height: 22px;
+  padding: 12px 16px;
+  color: transparent;
+  white-space: pre;
+  overflow: hidden;
+}
+
+/* Autocomplete Dropdown — fixed so it's never clipped by overflow:hidden parents */
+.autocomplete {
+  position: fixed;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(56,189,248,0.1);
+  z-index: 400;
+  min-width: 240px;
+  max-width: 340px;
+  max-height: 220px;
+  overflow-y: auto;
+  display: none;
+}
+.autocomplete.visible { display: block; }
+.autocomplete-item {
+  padding: 8px 12px;
+  font-family: var(--font-code);
+  font-size: 12px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+  display: flex; align-items: center; gap: 8px;
+  line-height: 1.4;
+}
+.autocomplete-item:last-child { border-bottom: none; }
+.autocomplete-item:hover, .autocomplete-item.selected { background: var(--primary-dim); }
+.ac-prop { color: #7DD3FC; }
+.ac-val { color: #86EFAC; }
+.ac-desc { font-size: 10px; color: var(--text3); margin-left: auto; font-family: var(--font-body); }
+
+/* Mobile Shortcut Bar */
+.shortcut-bar {
+  flex-shrink: 0;
+  display: flex;
+  gap: 4px;
+  padding: 6px 10px;
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.shortcut-bar::-webkit-scrollbar { display: none; }
+.shortcut-key {
+  flex-shrink: 0;
+  height: 32px;
+  min-width: 36px;
+  padding: 0 8px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: var(--font-code);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.shortcut-key:active { background: var(--primary-dim); border-color: var(--primary); color: var(--primary); transform: scale(0.93); }
+
+/* Submit / Feedback */
+.submit-bar {
+  flex-shrink: 0;
+  padding: 10px 14px;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  display: flex; gap: 8px;
+}
+.btn-submit {
+  flex: 1;
+  height: 44px;
+  border-radius: var(--radius);
+  background: var(--primary);
+  color: #0F172A;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  transition: all 0.2s;
+  letter-spacing: 0.3px;
+}
+.btn-submit:hover { background: #7DD3FC; }
+.btn-submit:active { transform: scale(0.97); }
+.btn-reset {
+  width: 44px; height: 44px;
+  border-radius: var(--radius);
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  font-size: 18px;
+  transition: all 0.2s;
+}
+.btn-reset:hover { border-color: var(--error); }
+
+/* Feedback Toast */
+.feedback-panel {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: var(--bg2);
+  border-top: 2px solid var(--border);
+  padding: 14px 16px;
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+  z-index: 300;
+}
+.feedback-panel.visible { transform: translateY(0); }
+.feedback-panel.success { border-top-color: var(--success); }
+.feedback-panel.error { border-top-color: var(--error); }
+.feedback-panel.warn { border-top-color: var(--warn); }
+.feedback-header {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 8px;
+}
+.feedback-icon { font-size: 22px; }
+.feedback-title { font-size: 15px; font-weight: 700; }
+.feedback-success .feedback-title { color: var(--success); }
+.feedback-error .feedback-title { color: var(--error); }
+.feedback-warn .feedback-title { color: var(--warn); }
+.feedback-body { font-size: 13px; color: var(--text2); line-height: 1.6; }
+.feedback-why {
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: var(--bg3);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.6;
+}
+.feedback-why strong { color: var(--text); }
+.feedback-confirm {
+  margin-top: 10px;
+  width: 100%;
+  height: 44px;
+  border-radius: 8px;
+  font-size: 14px; font-weight: 700;
+  background: var(--success);
+  color: #fff;
+  transition: all 0.2s;
+  letter-spacing: 0.2px;
+  font-family: var(--font-display);
+}
+.feedback-confirm:hover { background: #34D399; }
+.feedback-confirm:active { transform: scale(0.97); }
+.feedback-try {
+  margin-top: 10px;
+  width: 100%;
+  height: 40px;
+  border-radius: 8px;
+  font-size: 13px; font-weight: 700;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  transition: all 0.2s;
+}
+
+/* Mode indicator */
+.mode-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.mode-1 { background: rgba(16,185,129,0.15); color: var(--success); border: 1px solid rgba(16,185,129,0.3); }
+.mode-2 { background: var(--primary-dim); color: var(--primary); border: 1px solid rgba(56,189,248,0.3); }
+.mode-3 { background: var(--warn-dim); color: var(--warn); border: 1px solid rgba(251,191,36,0.3); }
+.mode-4 { background: rgba(244,63,94,0.1); color: var(--error); border: 1px solid rgba(244,63,94,0.3); }
+
+/* Choice Mode */
+.choices-grid {
+  padding: 12px 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.choice-btn {
+  padding: 12px;
+  background: var(--bg2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-code);
+  font-size: 12px;
+  text-align: left;
+  color: var(--text);
+  transition: all 0.2s;
+  line-height: 1.5;
+}
+.choice-btn:hover { border-color: var(--primary); background: var(--primary-dim); }
+.choice-btn:active { transform: scale(0.97); }
+.choice-btn.correct { border-color: var(--success); background: var(--success-dim); color: var(--success); }
+.choice-btn.wrong { border-color: var(--error); background: var(--error-dim); color: var(--error); }
+
+/* ═══════════════════════════════
+   ANALYTICS SCREEN
+═══════════════════════════════ */
+#screen-analytics { overflow-y: auto; }
+.analytics-content { padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+.analytics-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+}
+.analytics-card-title {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 14px;
+}
+/* Mini chart */
+.chart-bars {
+  display: flex; align-items: flex-end; gap: 6px;
+  height: 80px;
+}
+.chart-bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.chart-bar {
+  width: 100%;
+  background: linear-gradient(180deg, var(--primary), rgba(56,189,248,0.4));
+  border-radius: 4px 4px 0 0;
+  min-height: 4px;
+  transition: all 0.5s;
+}
+.chart-bar-lbl { font-size: 9px; color: var(--text3); }
+.error-breakdown { display: flex; flex-direction: column; gap: 6px; }
+.error-row { display: flex; align-items: center; gap: 8px; }
+.error-label { font-size: 12px; color: var(--text2); width: 120px; flex-shrink: 0; }
+.error-bar-wrap { flex: 1; height: 8px; background: var(--bg3); border-radius: 4px; overflow: hidden; }
+.error-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: var(--error);
+  transition: width 0.5s ease;
+}
+.error-count { font-size: 11px; color: var(--text3); width: 24px; text-align: right; }
+
+/* ═══════════════════════════════
+   LEVEL COMPLETE OVERLAY
+═══════════════════════════════ */
+.complete-overlay {
+  position: fixed; inset: 0;
+  background: rgba(9,15,28,0.92);
+  backdrop-filter: blur(10px);
+  z-index: 500;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s;
+}
+.complete-overlay.visible { opacity: 1; pointer-events: all; }
+.complete-card {
+  background: var(--bg2);
+  border: 1px solid rgba(56,189,248,0.3);
+  border-radius: 24px;
+  padding: 28px 24px;
+  text-align: center;
+  max-width: 340px;
+  width: 100%;
+  transform: scale(0.9) translateY(20px);
+  transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+.complete-overlay.visible .complete-card { transform: scale(1) translateY(0); }
+.complete-emoji { font-size: 64px; display: block; margin-bottom: 12px; animation: bounce 0.6s 0.3s ease both; }
+@keyframes bounce { 0% { transform: scale(0.5); } 60% { transform: scale(1.15); } 100% { transform: scale(1); } }
+.complete-title {
+  font-family: var(--font-display);
+  font-size: 26px; font-weight: 800;
+  background: linear-gradient(135deg, var(--success), var(--primary));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin-bottom: 6px;
+  letter-spacing: -0.5px;
+}
+.complete-sub { font-size: 14px; color: var(--text2); margin-bottom: 20px; line-height: 1.5; }
+.complete-stars { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; }
+.complete-star { font-size: 32px; opacity: 0; transition: all 0.3s; }
+.complete-star.lit { opacity: 1; }
+.complete-stats { display: flex; gap: 10px; margin-bottom: 20px; }
+.cstat {
+  flex: 1;
+  background: var(--bg3);
+  border-radius: 10px;
+  padding: 10px;
+  border: 1px solid var(--border);
+}
+.cstat-num { font-family: var(--font-display); font-size: 20px; font-weight: 800; line-height: 1.2; font-variant-numeric: tabular-nums; letter-spacing: -0.5px; }
+.cstat-lbl { font-size: 10px; color: var(--text2); margin-top: 2px; }
+.complete-btns { display: flex; gap: 8px; }
+.btn-next-level {
+  flex: 1;
+  height: 44px;
+  border-radius: 10px;
+  background: var(--primary);
+  color: #0F172A;
+  font-size: 14px; font-weight: 700;
+  font-family: var(--font-display);
+  transition: all 0.2s;
+}
+.btn-next-level:hover { background: #7DD3FC; }
+.btn-replay {
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  font-size: 18px;
+  transition: all 0.2s;
+}
+.btn-replay:hover { border-color: var(--primary); }
+
+/* ═══════════════════════════════
+   ROADMAP
+═══════════════════════════════ */
+/* Chapter tab strip */
+.roadmap-tabs {
+  display: flex;
+  gap: 5px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 0 16px 8px;
+}
+.roadmap-tabs::-webkit-scrollbar { display: none; }
+.roadmap-tab {
+  flex-shrink: 0;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text3);
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+}
+.roadmap-tab:hover { color: var(--text2); border-color: var(--border2); }
+.roadmap-tab.active {
+  background: var(--primary-dim);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.roadmap-tab.tab-done {
+  border-color: rgba(16,185,129,0.35);
+  color: var(--success);
+}
+.roadmap-tab.tab-done.active {
+  background: var(--success-dim);
+  border-color: var(--success);
+}
+.roadmap-tab.tab-preview {
+  /* locked but viewable — slightly dimmed */
+  opacity: 0.6;
+}
+.roadmap-tab.tab-preview:hover { opacity: 0.9; }
+.roadmap-tab-icon { display: none; }
+.roadmap-tab-badge { display: none; }
+/* Level list */
+.roadmap-levels {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.roadmap-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.roadmap-item:hover { border-color: var(--border2); transform: translateX(2px); }
+.roadmap-item.rm-done { border-color: rgba(16,185,129,0.25); }
+.roadmap-item.rm-current { border-color: var(--primary); background: var(--primary-dim); }
+.roadmap-item.rm-locked { opacity: 0.4; cursor: default; }
+.roadmap-item.rm-locked:hover { transform: none; }
+.roadmap-dot {
+  width: 28px; height: 28px;
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+  flex-shrink: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+.rm-done    .roadmap-dot { background: var(--success-dim); color: var(--success); border: 1px solid rgba(16,185,129,0.3); }
+.rm-current .roadmap-dot { background: var(--primary); color: #0f172a; }
+.rm-locked  .roadmap-dot { background: var(--bg3); color: var(--text3); border: 1px solid var(--border); }
+.rm-todo    .roadmap-dot { background: var(--bg3); color: var(--text2); border: 1px solid var(--border); }
+.roadmap-info { flex: 1; min-width: 0; }
+.roadmap-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.roadmap-meta { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.roadmap-status-icon { font-size: 15px; }
+/* Expand button */
+.roadmap-more {
+  margin-top: 6px;
+}
+.roadmap-more summary {
+  font-size: 12px;
+  color: var(--primary);
+  cursor: pointer;
+  padding: 8px 12px;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.roadmap-more summary::-webkit-details-marker { display: none; }
+.roadmap-more[open] summary .rm-chevron { transform: rotate(90deg); }
+.rm-chevron { display: inline-block; transition: transform 0.2s; font-style: normal; font-size: 10px; }
+/* Chapter progress bar inside list */
+.roadmap-ch-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 11px;
+  color: var(--text2);
+}
+.roadmap-ch-bar {
+  flex: 1;
+  height: 4px;
+  background: var(--bg3);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.roadmap-ch-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), #818CF8);
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+
+/* ═══════════════════════════════
+   BOTTOM NAV
+═══════════════════════════════ */
+.bottom-nav {
+  flex-shrink: 0;
+  height: 62px;
+  display: flex;
+  background: rgba(15,23,42,0.95);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  padding: 0 8px;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.bottom-nav-btn {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 3px;
+  padding: 8px;
+  border-radius: 10px;
+  margin: 4px 2px;
+  color: var(--text3);
+  font-size: 10px;
+  transition: all 0.2s;
+}
+.bottom-nav-btn.active { color: var(--primary); background: var(--primary-dim); }
+.bottom-nav-btn:not(.active):hover { color: var(--text2); }
+.bottom-nav-icon { font-size: 20px; line-height: 1; }
+
+/* ═══════════════════════════════
+   ANIMATIONS & UTILITIES
+═══════════════════════════════ */
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(56,189,248,0.4); }
+  100% { box-shadow: 0 0 0 10px rgba(56,189,248,0); }
+}
+.pulse { animation: pulse-ring 1.5s infinite; }
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+.shake { animation: shake 0.3s ease; }
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fade-up 0.3s ease forwards; }
+.hidden { display: none !important; }
+
+/* Desktop adjustments */
+@media (min-width: 600px) {
+  #screen-game {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .preview-box { height: 180px; }
+  .game-body { flex-direction: row; flex-wrap: wrap; }
+  .preview-area { flex: 1; min-width: 300px; }
+  .task-area { flex: 1; min-width: 300px; }
+  .editor-area { width: 100%; }
+}
+
+@media (min-width: 900px) {
+  #screen-game { max-width: 1000px; }
+  .game-body { flex-direction: row; }
+  .game-left { width: 45%; display: flex; flex-direction: column; border-right: 1px solid var(--border); }
+  .game-right { flex: 1; display: flex; flex-direction: column; }
+}
+
+/* Tablet */
+@media (min-width: 600px) {
+  .level-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+  .stats-row { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* Focus states */
+.code-input:focus { outline: none; }
+button:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ══════════════ HOME SCREEN ══════════════ -->
+  <div id="screen-home" class="screen active">
+    <div class="nav">
+      <div class="nav-logo">CSS Quest<span>Beta</span></div>
+      <div class="nav-actions">
+        <button class="nav-btn" onclick="showScreen('analytics')" title="學習分析">📊</button>
+        <button class="nav-btn" title="設定">⚙️</button>
+      </div>
+    </div>
+    <div id="home-scroll" style="flex:1;overflow-y:auto;padding-bottom:16px;">
+      <div class="home-hero">
+        <div class="hero-greeting">👋 歡迎回來</div>
+        <h1 class="hero-title">今天要挑戰<br>哪個關卡？</h1>
+        <p class="hero-sub">用玩遊戲的方式學 CSS，從完全看不懂到能自己寫出來。</p>
+      </div>
+
+      <!-- Streak -->
+      <div class="streak-card">
+        <div class="streak-icon">🔥</div>
+        <div class="streak-info">
+          <div class="streak-num" id="streak-num">3</div>
+          <div class="streak-label">連續學習天數</div>
+          <div class="streak-days" id="streak-days"></div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-num" style="color:var(--primary)" id="stat-done">0</div>
+          <div class="stat-lbl">完成關卡</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" style="color:var(--success)" id="stat-acc">—</div>
+          <div class="stat-lbl">正確率</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" style="color:var(--warn)" id="stat-time">0</div>
+          <div class="stat-lbl">今日練習</div>
+        </div>
+      </div>
+
+      <!-- Continue -->
+      <div class="section-header" style="padding-top:4px;">
+        <div class="section-title">繼續學習</div>
+      </div>
+      <div class="continue-card" id="continue-card" onclick="continuePlay()">
+        <div class="continue-top">
+          <div class="continue-icon" id="continue-icon">📝</div>
+          <div class="continue-meta">
+            <div class="continue-chapter" id="continue-chapter">第一章</div>
+            <div class="continue-name" id="continue-name">CSS 基礎</div>
+          </div>
+          <div class="continue-badge" id="continue-badge">進行中</div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="continue-progress" style="width:0%"></div></div>
+        <div class="progress-label"><span id="continue-done">0</span><span id="continue-pct">0%</span></div>
+      </div>
+
+      <!-- Learning Roadmap -->
+      <div class="section-header" style="margin-top:4px;">
+        <div class="section-title">📍 學習進度</div>
+      </div>
+      <!-- Chapter tab strip -->
+      <div class="roadmap-tabs" id="roadmap-tabs"></div>
+      <!-- Level list for selected chapter -->
+      <div id="roadmap-wrap" style="padding:0 16px 16px;"></div>
+
+      <!-- Weakness -->
+      <div class="section-header">
+        <div class="section-title">⚠️ 弱點分析</div>
+        <button class="section-link" onclick="showScreen('analytics')">查看全部</button>
+      </div>
+      <div class="weakness-panel">
+        <div style="font-size:12px;color:var(--text2);line-height:1.5;">根據你的練習紀錄，這些觀念需要加強：</div>
+        <div class="weakness-items" id="weakness-list"></div>
+      </div>
+
+      <!-- Chapters -->
+      <div class="section-header" style="margin-top:8px;">
+        <div class="section-title">學習章節</div>
+      </div>
+      <div class="chapter-list" id="chapter-list"></div>
+
+      <!-- Badges -->
+      <div class="section-header" style="margin-top:16px;">
+        <div class="section-title">🏆 成就徽章</div>
+      </div>
+      <div class="badges-scroll" id="badges-row"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════ CHAPTER SCREEN ══════════════ -->
+  <div id="screen-chapter" class="screen">
+    <div class="nav">
+      <button class="nav-back" onclick="showScreen('home')">← 返回</button>
+      <div class="nav-logo" id="chapter-nav-title">第一章</div>
+      <div></div>
+    </div>
+    <div class="level-grid" id="level-grid"></div>
+  </div>
+
+  <!-- ══════════════ GAME SCREEN ══════════════ -->
+  <div id="screen-game" class="screen">
+    <div class="game-nav">
+      <button class="nav-back" onclick="confirmLeave()" style="padding:6px 8px;font-size:12px;">← 退出</button>
+      <div class="game-progress-wrap">
+        <div class="game-level-label">
+          <span id="game-level-label">關卡 1</span>
+          <span id="game-mode-badge"></span>
+        </div>
+        <div class="game-progress-track">
+          <div class="game-progress-bar" id="game-progress-bar" style="width:0%"></div>
+        </div>
+      </div>
+      <div class="game-lives" id="game-lives"></div>
+    </div>
+
+    <div class="game-body" id="game-body">
+      <!-- Preview Area -->
+      <div class="preview-area" id="preview-area">
+        <div class="preview-tabs">
+          <button class="preview-tab active" id="tab-compare" onclick="setPreviewMode('compare')">對照</button>
+          <button class="preview-tab" id="tab-target" onclick="setPreviewMode('target')">目標</button>
+          <button class="preview-tab" id="tab-live" onclick="setPreviewMode('live')">即時</button>
+          <button class="preview-compare-btn" id="overlay-btn" onclick="toggleOverlay()">⊞ 疊加</button>
+        </div>
+        <div class="previews-container" id="previews-container">
+          <div class="preview-box target-box" id="target-preview">
+            <div class="preview-label target-lbl">目標</div>
+            <iframe class="preview-iframe" id="target-iframe" sandbox="allow-scripts"></iframe>
+          </div>
+          <div class="preview-box live-box" id="live-preview">
+            <div class="preview-label live-lbl">目前</div>
+            <iframe class="preview-iframe" id="live-iframe" sandbox="allow-scripts"></iframe>
+          </div>
+        </div>
+      </div>
+
+      <!-- Task + Editor Wrapper -->
+      <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+        <!-- Task Area -->
+        <div class="task-area" id="task-area">
+          <div class="task-header">
+            <div class="task-icon" id="task-icon">📋</div>
+            <div class="task-content">
+              <div class="task-title">客戶需求</div>
+              <div class="task-desc" id="task-desc">載入中...</div>
+            </div>
+          </div>
+          <div class="task-hint">
+            <span class="hint-icon">💡</span>
+            <div>
+              <span class="hint-toggle" onclick="toggleHint()">顯示提示</span>
+              <div class="hint-text" id="hint-text"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Choice Mode -->
+        <div id="choices-mode" class="hidden">
+          <div class="choices-grid" id="choices-grid"></div>
+        </div>
+
+        <!-- Editor Mode -->
+        <div id="editor-mode" class="editor-area">
+          <div class="editor-header">
+            <div class="editor-label">
+              <span style="color:var(--error)">●</span>
+              <span style="color:var(--warn)">●</span>
+              <span style="color:var(--success)">●</span>
+              &nbsp;style.css
+            </div>
+            <div class="editor-actions">
+              <button class="editor-action-btn" onclick="resetEditor()">重置</button>
+            </div>
+          </div>
+          <div class="code-editor-wrap">
+            <div class="code-lines" id="code-lines"></div>
+            <textarea class="code-input" id="code-input"
+              autocomplete="off" autocorrect="off" autocapitalize="off"
+              spellcheck="false"
+              placeholder="在這裡輸入 CSS..."
+              oninput="onCodeInput()"
+              onkeydown="onCodeKeydown(event)"
+              onscroll="syncScroll()"
+            ></textarea>
+          </div>
+          <div class="shortcut-bar" id="shortcut-bar"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit Bar -->
+    <div class="submit-bar" id="submit-bar">
+      <button class="btn-reset" onclick="resetEditor()" title="重置">↺</button>
+      <button class="btn-submit" id="btn-submit" onclick="submitAnswer()">✓ 提交答案</button>
+    </div>
+
+    <!-- Feedback Panel -->
+    <div class="feedback-panel" id="feedback-panel">
+      <div class="feedback-header">
+        <span class="feedback-icon" id="feedback-icon">✅</span>
+        <span class="feedback-title" id="feedback-title"></span>
+      </div>
+      <div class="feedback-body" id="feedback-body"></div>
+      <div class="feedback-why" id="feedback-why" style="display:none"></div>
+      <button class="feedback-confirm hidden" id="feedback-confirm" onclick="onFeedbackConfirm()">看完了 → 查看結果</button>
+      <button class="feedback-try hidden" id="feedback-try" onclick="closeFeedback()">再試一次</button>
+    </div>
+  </div>
+
+  <!-- ══════════════ ANALYTICS SCREEN ══════════════ -->
+  <div id="screen-analytics" class="screen">
+    <div class="nav">
+      <button class="nav-back" onclick="showScreen('home')">← 返回</button>
+      <div class="nav-logo">學習分析</div>
+      <div></div>
+    </div>
+    <div class="analytics-content">
+      <div class="analytics-card">
+        <div class="analytics-card-title">本週練習</div>
+        <div class="chart-bars" id="week-chart"></div>
+      </div>
+      <div class="analytics-card">
+        <div class="analytics-card-title">常見錯誤</div>
+        <div class="error-breakdown" id="error-breakdown"></div>
+      </div>
+      <div class="analytics-card">
+        <div class="analytics-card-title">弱點觀念</div>
+        <div class="weakness-items" id="analytics-weakness"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ LEVEL COMPLETE ══════════════ -->
+  <div class="complete-overlay" id="complete-overlay">
+    <div class="complete-card">
+      <span class="complete-emoji" id="complete-emoji">🎉</span>
+      <div class="complete-title" id="complete-title">太厲害了！</div>
+      <div class="complete-sub" id="complete-sub">你完成了這一關</div>
+      <div class="complete-stars" id="complete-stars"></div>
+      <div class="complete-stats">
+        <div class="cstat">
+          <div class="cstat-num" id="cstat-time" style="color:var(--primary)">--</div>
+          <div class="cstat-lbl">秒數</div>
+        </div>
+        <div class="cstat">
+          <div class="cstat-num" id="cstat-tries" style="color:var(--warn)">--</div>
+          <div class="cstat-lbl">嘗試次數</div>
+        </div>
+        <div class="cstat">
+          <div class="cstat-num" id="cstat-xp" style="color:var(--success)">+50</div>
+          <div class="cstat-lbl">經驗值</div>
+        </div>
+      </div>
+      <div class="complete-btns">
+        <button class="btn-replay" onclick="replayLevel()">↺</button>
+        <button class="btn-next-level" onclick="nextLevel()">下一關 →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ BOTTOM NAV ══════════════ -->
+  <div class="bottom-nav" id="bottom-nav">
+    <button class="bottom-nav-btn active" id="bnav-home" onclick="showScreen('home')">
+      <span class="bottom-nav-icon">🏠</span>首頁
+    </button>
+    <button class="bottom-nav-btn" id="bnav-learn" onclick="openChapter(0)">
+      <span class="bottom-nav-icon">📚</span>關卡
+    </button>
+    <button class="bottom-nav-btn" id="bnav-analytics" onclick="showScreen('analytics')">
+      <span class="bottom-nav-icon">📊</span>分析
+    </button>
+    <button class="bottom-nav-btn" id="bnav-badges" onclick="scrollToBadges()">
+      <span class="bottom-nav-icon">🏆</span>成就
+    </button>
+  </div>
+
+  <!-- Autocomplete portal — fixed position, never clipped by overflow:hidden -->
+  <div class="autocomplete" id="autocomplete"></div>
+
+</div><!-- #app -->
+
+<script>
+/* ═══════════════════════════════════════════════════
+   DATA
+═══════════════════════════════════════════════════ */
+const CHAPTERS = [
+  { id:0, num:'01', name:'CSS 基礎', desc:'屬性、值、分號的基本語法', icon:'📝', status:'done', levels:5 },
+  { id:1, num:'02', name:'文字樣式', desc:'color, font-size, text-align', icon:'🎨', status:'active', levels:5 },
+  { id:2, num:'03', name:'盒模型', desc:'margin, padding, border', icon:'📦', status:'locked', levels:6 },
+  { id:3, num:'04', name:'背景與色彩', desc:'background-color, opacity', icon:'🖌️', status:'locked', levels:5 },
+  { id:4, num:'05', name:'Auto Layout', desc:'display:flex — 設計師最愛', icon:'⬛', status:'locked', levels:7 },
+  { id:5, num:'06', name:'Grid 排版', desc:'二維排版的魔法', icon:'🔲', status:'locked', levels:6 },
+  { id:6, num:'07', name:'圖層定位', desc:'relative, absolute, fixed', icon:'📌', status:'locked', levels:6 },
+  { id:7, num:'08', name:'響應式設計', desc:'手機版與桌機版', icon:'📱', status:'locked', levels:5 },
+  { id:8, num:'09', name:'實戰元件', desc:'Button, Card, Banner...', icon:'🚀', status:'locked', levels:8 },
+];
+
+// All levels
+const ALL_LEVELS = [
+  // Chapter 0 — CSS Basics
+  {
+    id:'0-1', chapter:0, num:1, title:'認識分號', diff:1, icon:'✏️',
+    mode:1, // choice
+    desc:'客戶要求把這段 CSS 補完整，目前缺少一個重要符號。',
+    hint:'每一行 CSS 結尾都需要一個符號來告訴瀏覽器「這行結束了」。',
+    designerHint:'就像 Figma 裡按 Enter 確認輸入一樣，CSS 需要分號來「確認」。',
+    baseCSS: `.button {\n  color: red\n  font-size: 16px;\n}`,
+    targetCSS: `.button {\n  color: red;\n  font-size: 16px;\n}`,
+    htmlTemplate: `<div style="display:flex;align-items:center;justify-content:center;height:100%;background:#f8fafc;"><button class="button" style="STYLE_INJECT">Click Me</button></div>`,
+    targetStyle: 'color:red;font-size:16px;',
+    baseStyle: 'color:red;font-size:16px;',
+    choices: [
+      { text:'color: red;', correct: true, why: '對！分號 ; 是 CSS 的句點，告訴瀏覽器這行指令到這裡結束。' },
+      { text:'color: red:', wrong: true, why: '冒號 : 是用來分隔屬性和值，不是放在結尾的。' },
+      { text:'color: red.', wrong: true, why: '句點 . 在 CSS 裡是選取器（class），不是用來結束的。' },
+      { text:'color: red,', wrong: true, why: '逗號 , 在 CSS 裡用來分隔多個選取器，不是用來結束的。' },
+    ],
+    successMsg: '太棒了！記住：每行 CSS 都要用分號 ; 結尾。',
+    successWhy: '<strong>為什麼？</strong> 分號是 CSS 的「句點」。沒有分號，瀏覽器不知道這行指令到哪裡結束，就會把下一行也當成同一行來讀，導致樣式跑掉。',
+  },
+  {
+    id:'0-2', chapter:0, num:2, title:'認識大括號', diff:1, icon:'🔧',
+    mode:1,
+    desc:'客戶說樣式完全沒有套用到按鈕，你能找到問題嗎？',
+    hint:'CSS 規則用 { } 把樣式包起來，就像 Figma 的圖層群組。',
+    designerHint:'大括號 { } 就是告訴瀏覽器「以下這些樣式都屬於這個元素」。',
+    baseCSS: `.button\n  color: #38BDF8;\n  font-size: 18px;\n`,
+    targetCSS: `.button {\n  color: #38BDF8;\n  font-size: 18px;\n}`,
+    htmlTemplate: `<div style="display:flex;align-items:center;justify-content:center;height:100%;background:#f8fafc;"><button class="button" style="STYLE_INJECT">按鈕</button></div>`,
+    targetStyle: 'color:#38BDF8;font-size:18px;',
+    baseStyle: '',
+    choices: [
+      { text: '.button { color: #38BDF8; font-size: 18px; }', correct: true, why: '對！大括號 { } 把樣式群組起來，少了它，CSS 就不會生效。' },
+      { text: '.button: color: #38BDF8; font-size: 18px;', wrong: true, why: '冒號在 CSS 是分隔屬性和值用的，不能取代大括號。' },
+      { text: '.button ( color: #38BDF8; font-size: 18px; )', wrong: true, why: 'CSS 用的是大括號 { }，不是小括號 ( )。' },
+      { text: '.button [ color: #38BDF8; font-size: 18px; ]', wrong: true, why: 'CSS 用的是大括號 { }，中括號是選取器用的。' },
+    ],
+    successMsg: '完美！大括號讓瀏覽器知道這些樣式屬於哪個元素。',
+    successWhy: '<strong>為什麼？</strong> 大括號 { } 就像 Figma 的群組，把樣式「歸屬」到正確的元素。沒有大括號，瀏覽器找不到這些樣式要套用在哪裡。',
+  },
+  {
+    id:'0-3', chapter:0, num:3, title:'屬性與值', diff:1, icon:'⚡',
+    mode:1,
+    desc:'要讓文字變成藍色，下面哪個寫法是正確的 CSS？',
+    hint:'CSS 的格式是：屬性名稱 : 值 ;',
+    designerHint:'就像 Figma 裡的「填充」欄位，CSS 也有對應的屬性名稱和值。',
+    baseCSS: `.text {\n  /* 讓文字變藍色 */\n}`,
+    targetCSS: `.text {\n  color: blue;\n}`,
+    htmlTemplate: `<div style="display:flex;align-items:center;justify-content:center;height:100%;background:#f8fafc;"><p class="text" style="STYLE_INJECT;font-size:18px;font-weight:bold;">Hello World</p></div>`,
+    targetStyle: 'color:blue;',
+    baseStyle: 'color:#333;',
+    choices: [
+      { text:'color: blue;', correct: true, why: '正確格式！屬性名 : 值 ;' },
+      { text:'blue: color;', wrong: true, why: '順序反了！應該是「屬性:值」，不是「值:屬性」。' },
+      { text:'color = blue;', wrong: true, why: '在 CSS 裡用冒號 : 分隔，不是等號 =。' },
+      { text:'(color, blue);', wrong: true, why: 'CSS 沒有這種格式，這是其他程式語言的寫法。' },
+    ],
+    successMsg: '很棒！你掌握了 CSS 最基本的格式：屬性:值;',
+    successWhy: '<strong>為什麼？</strong> CSS 的格式永遠是 <code>屬性: 值;</code>。記住這個模式，就能看懂幾乎所有 CSS。',
+  },
+  {
+    id:'0-4', chapter:0, num:4, title:'認識選取器', diff:2, icon:'🎯',
+    mode:2, // half-input
+    desc:'客戶想要把所有段落 <p> 的文字都變大，用什麼選取器？',
+    hint:'要選取所有段落，直接用 HTML 標籤名稱就可以。',
+    designerHint:'選取器就像 Figma 裡用圖層名稱來選取元素。',
+    baseCSS: `/* 在這裡輸入 p 的樣式 */`,
+    targetCSS: `p {\n  font-size: 20px;\n}`,
+    htmlTemplate: `<div style="padding:16px;background:#f8fafc;height:100%;"><p style="STYLE_INJECT">第一段文字</p><p style="STYLE_INJECT">第二段文字</p></div>`,
+    targetStyle: 'font-size:20px;',
+    baseStyle: 'font-size:14px;',
+    validate: (css) => css.includes('p') && css.includes('font-size') && (css.includes('20px') || css.includes('1.4rem')),
+    placeholder: 'p {\n  font-size: 20px;\n}',
+    successMsg: '完美！p 選取器會選到頁面上所有的段落。',
+    successWhy: '<strong>為什麼？</strong> 用 HTML 標籤名稱當選取器，可以一次改變頁面上所有同類型的元素。這就像在 Figma 裡用「選取相同圖層類型」。',
+  },
+  {
+    id:'0-5', chapter:0, num:5, title:'Class 選取器', diff:2, icon:'🔖',
+    mode:2,
+    desc:'要選取 class="card" 的元素，應該在選取器前面加什麼符號？',
+    hint:'Class 選取器的前面要加一個點。就像 Figma 的元件名稱。',
+    designerHint:'.card 中的點（.）代表「class」。這是 CSS 最常用的選取器。',
+    baseCSS: `card {\n  background: #fff;\n  border-radius: 12px;\n}`,
+    targetCSS: `.card {\n  background: #fff;\n  border-radius: 12px;\n  padding: 16px;\n}`,
+    htmlTemplate: `<div style="display:flex;align-items:center;justify-content:center;height:100%;background:#e2e8f0;"><div class="card" style="STYLE_INJECT">我是卡片</div></div>`,
+    targetStyle: 'background:#fff;border-radius:12px;padding:16px;',
+    baseStyle: '',
+    validate: (css) => css.includes('.card') && css.includes('{') && css.includes('}'),
+    placeholder: '.card {\n  background: #fff;\n  border-radius: 12px;\n}',
+    successMsg: '完美！. 點符號是選取 class 的方式。',
+    successWhy: '<strong>為什麼？</strong> CSS 有三種主要選取器：<br>• 標籤 p — 選所有段落<br>• <strong>.class</strong> — 選有這個 class 的元素<br>• #id — 選特定 id 的元素',
+  },
+
+  // Chapter 1 — Text Styles
+  {
+    id:'1-1', chapter:1, num:1, title:'文字顏色', diff:1, icon:'🖊️',
+    mode:1,
+    desc:'客戶要把標題改成品牌藍色 #38BDF8，用哪個 CSS 屬性？',
+    hint:'控制文字顏色的屬性叫做 color。',
+    designerHint:'就像 Figma 文字工具裡的「填充顏色」，CSS 用 color 來設定文字顏色。',
+    baseCSS: `.title {\n  font-size: 24px;\n}`,
+    targetCSS: `.title {\n  font-size: 24px;\n  color: #38BDF8;\n}`,
+    htmlTemplate: `<div style="display:flex;align-items:center;justify-content:center;height:100%;background:#0f172a;"><h1 class="title" style="STYLE_INJECT">品牌標題</h1></div>`,
+    targetStyle: 'font-size:24px;color:#38BDF8;',
+    baseStyle: 'font-size:24px;color:#333;',
+    choices: [
+      { text:'color: #38BDF8;', correct: true, why: '對！color 是控制文字顏色的屬性。' },
+      { text:'text-color: #38BDF8;', wrong: true, why: 'CSS 沒有 text-color 這個屬性，正確的是 color。' },
+      { text:'font-color: #38BDF8;', wrong: true, why: 'CSS 沒有 font-color，雖然很直覺，但正確的是 color。' },
+      { text:'fill: #38BDF8;', wrong: true, why: 'fill 是 SVG 圖形用的，不是 HTML 文字。文字顏色用 color。' },
+    ],
+    successMsg: 'color 屬性搞定！記住：文字顏色永遠用 color。',
+    successWhy: '<strong>設計師對照：</strong> Figma 的「文字填充」= CSS 的 color 屬性。可以用顏色名稱 (red)、HEX (#38BDF8) 或 RGB 值來指定顏色。',
+  },
+  {
+    id:'1-2', chapter:1, num:2, title:'文字大小', diff:1, icon:'🔤',
+    mode:1,
+    desc:'客戶覺得內文字太小，要從 14px 改成 18px，用哪個屬性？',
+    hint:'文字大小的屬性叫 font-size，就像 Figma 裡的字體大小欄位。',
+    designerHint:'Figma 字體大小欄位 = CSS font-size',
+    baseCSS: `.body-text {\n  color: #333;\n}`,
+    targetCSS: `.body-text {\n  color: #333;\n  font-size: 18px;\n}`,
+    htmlTemplate: `<div style="display:flex;align-items:center;justify-content:center;height:100%;background:#f8fafc;padding:16px;text-align:center;"><p class="body-text" style="STYLE_INJECT">這是一段內文，客戶覺得字太小了，需要調大一點才夠清楚。</p></div>`,
+    targetStyle: 'color:#333;font-size:18px;',
+    baseStyle: 'color:#333;font-size:14px;',
+    choices: [
+      { text:'font-size: 18px;', correct: true, why: '正確！font-size 控制文字大小，單位 px 是像素。' },
+      { text:'text-size: 18px;', wrong: true, why: 'CSS 沒有 text-size，正確的屬性名稱是 font-size。' },
+      { text:'font: 18px;', wrong: true, why: 'font 是縮寫屬性，單獨寫 18px 可能不會生效，建議用 font-size。' },
+      { text:'size: 18px;', wrong: true, why: 'CSS 沒有 size 這個屬性。字體大小要用 font-size。' },
+    ],
+    successMsg: '字體變大了！font-size 是最常用的文字屬性之一。',
+    successWhy: '<strong>常用單位：</strong><br>• px — 固定像素，精確<br>• rem — 相對根元素，RWD 友善<br>• % — 相對父元素<br>設計師通常先用 px，之後再換 rem。',
+  },
+  {
+    id:'1-3', chapter:1, num:3, title:'文字置中', diff:1, icon:'⬛',
+    mode:1,
+    desc:'客戶要把標題文字水平置中，就像 Figma 的對齊工具。',
+    hint:'控制文字水平對齊的屬性叫 text-align，就像 Figma 的段落對齊。',
+    designerHint:'Figma 文字對齊：置中 = CSS text-align: center',
+    baseCSS: `.heading {\n  font-size: 28px;\n  font-weight: bold;\n}`,
+    targetCSS: `.heading {\n  font-size: 28px;\n  font-weight: bold;\n  text-align: center;\n}`,
+    htmlTemplate: `<div style="display:flex;align-items:center;justify-content:center;height:100%;background:#f8fafc;"><div style="width:100%;padding:20px;"><h2 class="heading" style="STYLE_INJECT">標題文字</h2><p style="font-size:14px;color:#64748b;margin-top:8px;">這是一段說明文字</p></div></div>`,
+    targetStyle: 'font-size:28px;font-weight:bold;text-align:center;',
+    baseStyle: 'font-size:28px;font-weight:bold;text-align:left;',
+    choices: [
+      { text:'text-align: center;', correct: true, why: '完全正確！text-align:center 讓文字水平置中。' },
+      { text:'align: center;', wrong: true, why: 'CSS 沒有 align 這個獨立屬性，文字對齊要用 text-align。' },
+      { text:'margin: auto;', wrong: true, why: 'margin:auto 是用來讓「區塊元素」水平置中，不是文字對齊。兩個概念不同喔！' },
+      { text:'position: center;', wrong: true, why: 'position 是控制元素定位的，不是文字對齊。值也沒有 center。' },
+    ],
+    successMsg: '文字置中成功！text-align 控制文字的水平對齊方式。',
+    successWhy: '<strong>text-align 的四個值：</strong><br>• left — 靠左（預設）<br>• center — 置中<br>• right — 靠右<br>• justify — 兩端對齊',
+  },
+  {
+    id:'1-4', chapter:1, num:4, title:'行高', diff:2, icon:'↕️',
+    mode:2,
+    desc:'客戶覺得段落文字太擠，要增加行距，讓閱讀更舒服。',
+    hint:'控制行距的屬性叫 line-height，值通常用 1.5 或 1.6（無單位）。',
+    designerHint:'Figma 的「行高」= CSS line-height。建議值：1.5～1.8',
+    baseCSS: `p {\n  font-size: 16px;\n  color: #333;\n}`,
+    targetCSS: `p {\n  font-size: 16px;\n  color: #333;\n  line-height: 1.8;\n}`,
+    htmlTemplate: `<div style="padding:16px;background:#f8fafc;height:100%;"><p style="STYLE_INJECT">設計師最常遇到的問題之一，就是文字太擠。增加行高可以讓段落更透氣，讀者閱讀起來更輕鬆。這個屬性在 Figma 裡也有對應的欄位。</p></div>`,
+    targetStyle: 'font-size:16px;color:#333;line-height:1.8;',
+    baseStyle: 'font-size:16px;color:#333;line-height:1.2;',
+    validate: (css) => css.includes('line-height') && (css.match(/line-height\s*:\s*1\.[5-9]/) || css.includes('1.8') || css.includes('1.6') || css.includes('1.5') || css.includes('2')),
+    placeholder: 'p {\n  font-size: 16px;\n  color: #333;\n  line-height: 1.8;\n}',
+    successMsg: '行高增加了，閱讀起來舒服多了！',
+    successWhy: '<strong>設計建議：</strong> 內文行高通常設為 1.5～1.8，標題行高設 1.1～1.3。無單位的寫法（如 1.6）是最佳實踐，代表「字體大小的 1.6 倍」。',
+  },
+  {
+    id:'1-5', chapter:1, num:5, title:'粗體與字型', diff:2, icon:'B',
+    mode:2,
+    desc:'客戶想要強調按鈕文字，讓它變粗體（700），同時加大到 16px。',
+    hint:'粗體用 font-weight: 700，字體大小用 font-size: 16px。',
+    designerHint:'Figma 字重欄位 = CSS font-weight。Bold = 700',
+    baseCSS: `.btn {\n  color: white;\n  background: #38BDF8;\n  padding: 10px 20px;\n  border-radius: 8px;\n}`,
+    targetCSS: `.btn {\n  color: white;\n  background: #38BDF8;\n  padding: 10px 20px;\n  border-radius: 8px;\n  font-weight: 700;\n  font-size: 16px;\n}`,
+    htmlTemplate: `<div style="display:flex;align-items:center;justify-content:center;height:100%;background:#f8fafc;"><button class="btn" style="STYLE_INJECT;border:none;cursor:pointer;">立即購買</button></div>`,
+    targetStyle: 'color:white;background:#38BDF8;padding:10px 20px;border-radius:8px;font-weight:700;font-size:16px;',
+    baseStyle: 'color:white;background:#38BDF8;padding:10px 20px;border-radius:8px;font-weight:400;font-size:13px;',
+    validate: (css) => css.includes('font-weight') && (css.includes('700') || css.includes('bold')) && css.includes('font-size') && css.includes('16px'),
+    placeholder: '.btn {\n  font-weight: 700;\n  font-size: 16px;\n}',
+    successMsg: '按鈕文字更有力量了！',
+    successWhy: '<strong>font-weight 常用值：</strong><br>• 400 — Regular（普通）<br>• 500 — Medium<br>• 600 — SemiBold<br>• 700 — Bold<br>• 900 — Black',
+  },
+
+  // Chapter 2 — Box Model
+  {
+    id:'2-1', chapter:2, num:1, title:'認識 padding', diff:1, icon:'📦',
+    mode:1,
+    desc:'客戶說按鈕看起來太擠了，要在文字四周加一些「呼吸空間」。',
+    hint:'padding 是元件裡面的距離（內距），就像 Figma 的「內部填充」。',
+    designerHint:'Figma Auto Layout 的 Padding = CSS padding',
+    baseCSS: `.button {\n  background: #38BDF8;\n  color: #0f172a;\n  border-radius: 8px;\n}`,
+    targetCSS: `.button {\n  background: #38BDF8;\n  color: #0f172a;\n  border-radius: 8px;\n  padding: 12px 24px;\n}`,
+    htmlTemplate: `<div style="display:flex;align-items:center;justify-content:center;height:100%;background:#f8fafc;"><button class="button" style="STYLE_INJECT;border:none;font-size:15px;font-weight:600;cursor:pointer;">按鈕文字</button></div>`,
+    targetStyle: 'background:#38BDF8;color:#0f172a;border-radius:8px;padding:12px 24px;',
+    baseStyle: 'background:#38BDF8;color:#0f172a;border-radius:8px;padding:2px 4px;',
+    choices: [
+      { text:'padding: 12px 24px;', correct: true, why: '對！padding 是元素內部的間距。12px 是上下，24px 是左右。' },
+      { text:'margin: 12px 24px;', wrong: true, why: 'margin 是元素外部的間距，會影響按鈕和其他元素的距離，不是按鈕內部的空間。' },
+      { text:'spacing: 12px 24px;', wrong: true, why: 'CSS 沒有 spacing 這個屬性，Figma 有，但 CSS 要用 padding 或 margin。' },
+      { text:'border: 12px 24px;', wrong: true, why: 'border 是邊框線，不是內部間距。邊框的寫法也不是這樣。' },
+    ],
+    successMsg: '按鈕空間感出來了！padding = 元件裡面的距離。',
+    successWhy: '<strong>記憶方法：</strong><br>• <strong>padding</strong> = 元件「裡面」的距離（像填充物）<br>• margin = 元件「外面」的距離（像邊界）',
+  },
+  {
+    id:'2-2', chapter:2, num:2, title:'padding 方向', diff:2, icon:'↔️',
+    mode:2,
+    desc:'客戶要讓卡片上下各有 24px 留白，左右各有 20px 留白。',
+    hint:'padding 可以分別設定四個方向：上右下左。或者用縮寫：padding: 上下 左右;',
+    designerHint:'Figma 的 Top/Bottom Padding 和 Left/Right Padding 可以在 CSS 裡一起設定。',
+    baseCSS: `.card {\n  background: white;\n  border-radius: 12px;\n}`,
+    targetCSS: `.card {\n  background: white;\n  border-radius: 12px;\n  padding: 24px 20px;\n}`,
+    htmlTemplate: `<div style="display:flex;align-items:center;justify-content:center;height:100%;background:#e2e8f0;"><div class="card" style="STYLE_INJECT;width:200px;"><h3 style="font-size:15px;margin-bottom:8px;">卡片標題</h3><p style="font-size:12px;color:#64748b;">這是卡片內容文字</p></div></div>`,
+    targetStyle: 'background:white;border-radius:12px;padding:24px 20px;',
+    baseStyle: 'background:white;border-radius:12px;padding:0;',
+    validate: (css) => css.includes('padding') && (css.includes('24px') || css.match(/padding-top\s*:\s*24px/)),
+    placeholder: '.card {\n  padding: 24px 20px;\n}',
+    successMsg: '卡片的留白比例完美！',
+    successWhy: '<strong>padding 縮寫規則：</strong><br>• padding: 16px → 四邊都是 16px<br>• padding: 24px 20px → 上下 24px，左右 20px<br>• padding: 10px 20px 30px 40px → 上 右 下 左（順時針）',
+  },
+];
+
+// ─── Autocomplete Data ───
+const CSS_COMPLETIONS = [
+  { prop:'color', val:'#38BDF8', full:'color: #38BDF8;', desc:'文字顏色' },
+  { prop:'color', val:'red', full:'color: red;', desc:'文字顏色' },
+  { prop:'color', val:'white', full:'color: white;', desc:'文字顏色' },
+  { prop:'background-color', val:'#38BDF8', full:'background-color: #38BDF8;', desc:'背景色' },
+  { prop:'background', val:'#f8fafc', full:'background: #f8fafc;', desc:'背景' },
+  { prop:'font-size', val:'16px', full:'font-size: 16px;', desc:'字體大小' },
+  { prop:'font-size', val:'18px', full:'font-size: 18px;', desc:'字體大小' },
+  { prop:'font-size', val:'24px', full:'font-size: 24px;', desc:'字體大小' },
+  { prop:'font-weight', val:'700', full:'font-weight: 700;', desc:'字體粗細' },
+  { prop:'font-weight', val:'400', full:'font-weight: 400;', desc:'字體粗細' },
+  { prop:'text-align', val:'center', full:'text-align: center;', desc:'文字對齊' },
+  { prop:'text-align', val:'left', full:'text-align: left;', desc:'文字對齊' },
+  { prop:'text-align', val:'right', full:'text-align: right;', desc:'文字對齊' },
+  { prop:'line-height', val:'1.6', full:'line-height: 1.6;', desc:'行高' },
+  { prop:'line-height', val:'1.8', full:'line-height: 1.8;', desc:'行高' },
+  { prop:'line-height', val:'1.5', full:'line-height: 1.5;', desc:'行高' },
+  { prop:'padding', val:'16px', full:'padding: 16px;', desc:'內距' },
+  { prop:'padding', val:'12px 24px', full:'padding: 12px 24px;', desc:'內距' },
+  { prop:'padding', val:'24px 20px', full:'padding: 24px 20px;', desc:'內距' },
+  { prop:'margin', val:'0 auto', full:'margin: 0 auto;', desc:'外距' },
+  { prop:'margin', val:'16px', full:'margin: 16px;', desc:'外距' },
+  { prop:'border-radius', val:'8px', full:'border-radius: 8px;', desc:'圓角' },
+  { prop:'border-radius', val:'12px', full:'border-radius: 12px;', desc:'圓角' },
+  { prop:'border-radius', val:'50%', full:'border-radius: 50%;', desc:'圓形' },
+  { prop:'border', val:'1px solid #e2e8f0', full:'border: 1px solid #e2e8f0;', desc:'邊框' },
+  { prop:'width', val:'100%', full:'width: 100%;', desc:'寬度' },
+  { prop:'width', val:'200px', full:'width: 200px;', desc:'寬度' },
+  { prop:'height', val:'auto', full:'height: auto;', desc:'高度' },
+  { prop:'height', val:'100px', full:'height: 100px;', desc:'高度' },
+  { prop:'display', val:'flex', full:'display: flex;', desc:'Auto Layout' },
+  { prop:'display', val:'block', full:'display: block;', desc:'區塊' },
+  { prop:'display', val:'none', full:'display: none;', desc:'隱藏' },
+  { prop:'justify-content', val:'center', full:'justify-content: center;', desc:'主軸置中' },
+  { prop:'justify-content', val:'space-between', full:'justify-content: space-between;', desc:'主軸分散' },
+  { prop:'justify-content', val:'flex-start', full:'justify-content: flex-start;', desc:'主軸靠前' },
+  { prop:'align-items', val:'center', full:'align-items: center;', desc:'次軸置中' },
+  { prop:'align-items', val:'flex-start', full:'align-items: flex-start;', desc:'次軸靠上' },
+  { prop:'align-items', val:'flex-end', full:'align-items: flex-end;', desc:'次軸靠下' },
+  { prop:'gap', val:'8px', full:'gap: 8px;', desc:'元件間距' },
+  { prop:'gap', val:'16px', full:'gap: 16px;', desc:'元件間距' },
+  { prop:'opacity', val:'0.8', full:'opacity: 0.8;', desc:'透明度' },
+  { prop:'position', val:'relative', full:'position: relative;', desc:'相對定位' },
+  { prop:'position', val:'absolute', full:'position: absolute;', desc:'絕對定位' },
+  { prop:'position', val:'fixed', full:'position: fixed;', desc:'固定定位' },
+];
+
+const SHORTCUTS = [':', ';', '{', '}', 'px', '%', 'rem', '#', '.', '0', '!'];
+
+const BADGES = [
+  { id:'first_step',    emoji:'🌱', name:'第一步',   desc:'完成第一關' },
+  { id:'streak3',       emoji:'🔥', name:'熱身完畢', desc:'連續3天練習' },
+  { id:'text_chapter',  emoji:'🎨', name:'調色師',   desc:'完成文字章節' },
+  { id:'box_chapter',   emoji:'📦', name:'盒模型師', desc:'完成盒模型章節' },
+  { id:'flex_chapter',  emoji:'⚡', name:'Flex 高手',desc:'完成 Flex 章節' },
+  { id:'all_done',      emoji:'🏆', name:'CSS 勇者', desc:'完成所有關卡' },
+  { id:'perfecto',      emoji:'⭐', name:'完美主義', desc:'三星通關 5 關' },
+  { id:'speedrun',      emoji:'🚀', name:'速通選手', desc:'60秒內通關' },
+];
+
+const WEAKNESSES = [
+  { icon:'⚠️', text:'Flex 對齊觀念不熟', key:'flex' },
+  { icon:'⚠️', text:'常漏分號 (;)', key:'semicolon' },
+  { icon:'⚠️', text:'padding / margin 常混淆', key:'spacing' },
+];
+
+const ERROR_BREAKDOWN = [
+  { label:'漏掉分號', count:8 },
+  { label:'padding/margin 混淆', count:5 },
+  { label:'屬性名稱錯誤', count:4 },
+  { label:'值的格式錯誤', count:3 },
+  { label:'選取器語法', count:2 },
+];
+
+// ─── User Data — default blank state, persisted per-browser via localStorage ───
+const DEFAULT_CHAPTER_STATUS = { 0: 'active' };
+
+function buildFreshUserData() {
+  return {
+    completedLevels: new Set(),
+    currentChapter: 0,
+    currentLevelId: '0-1',
+    streak: 0,
+    lastPlayedDate: null,
+    totalXP: 0,
+    sessionsToday: 0,
+    sessionDate: null,
+    errors: {},
+    totalAttempts: 0,
+    totalCorrect: 0,
+    chapterStatus: Object.assign({}, DEFAULT_CHAPTER_STATUS),
+    badges: [],
+  };
+}
+
+function loadUserData() {
+  try {
+    const raw = localStorage.getItem('cssquest_v1');
+    if (!raw) return buildFreshUserData();
+    const parsed = JSON.parse(raw);
+    parsed.completedLevels = new Set(parsed.completedLevels || []);
+    parsed.errors        = parsed.errors || {};
+    parsed.chapterStatus = parsed.chapterStatus || Object.assign({}, DEFAULT_CHAPTER_STATUS);
+    parsed.badges        = parsed.badges || [];
+    parsed.totalAttempts = parsed.totalAttempts || 0;
+    parsed.totalCorrect  = parsed.totalCorrect  || 0;
+    const today     = new Date().toDateString();
+    const yesterday = new Date(Date.now() - 86400000).toDateString();
+    if (parsed.sessionDate !== today) { parsed.sessionsToday = 0; parsed.sessionDate = today; }
+    if (parsed.lastPlayedDate && parsed.lastPlayedDate !== today && parsed.lastPlayedDate !== yesterday) {
+      parsed.streak = 0;
+    }
+    return parsed;
+  } catch(e) { return buildFreshUserData(); }
+}
+
+function saveUserData() {
+  try {
+    const toSave = Object.assign({}, userData);
+    toSave.completedLevels = [...userData.completedLevels];
+    localStorage.setItem('cssquest_v1', JSON.stringify(toSave));
+  } catch(e) {}
+}
+
+function recordVisit() {
+  // Called once on app load — updates streak & session date
+  const today     = new Date().toDateString();
+  const yesterday = new Date(Date.now() - 86400000).toDateString();
+  if (userData.sessionDate !== today) {
+    userData.sessionsToday = 0;
+    userData.sessionDate = today;
+  }
+  if (userData.lastPlayedDate !== today) {
+    userData.streak = (userData.lastPlayedDate === yesterday)
+      ? (userData.streak + 1) : 1;
+    userData.lastPlayedDate = today;
+  }
+  saveUserData();
+}
+
+function recordPlaySession() {
+  // Called when a level is completed — increments today's session count
+  const today = new Date().toDateString();
+  if (userData.sessionDate !== today) { userData.sessionsToday = 0; userData.sessionDate = today; }
+  userData.sessionsToday += 1;
+  saveUserData();
+}
+
+function computeAccuracy() {
+  if (!userData.totalAttempts) return null;
+  return Math.round((userData.totalCorrect / userData.totalAttempts) * 100);
+}
+
+function getChapterStatus(chId) {
+  if (userData.chapterStatus[chId] !== undefined) return userData.chapterStatus[chId];
+  return chId === 0 ? 'active' : 'locked';
+}
+
+function computeWeaknesses() {
+  const errs = userData.errors || {};
+  const sorted = Object.entries(errs).sort((a,b) => b[1]-a[1]);
+  const MAP = {
+    semicolon: { icon:'⚠️', text:'常漏掉分號 (;)',          key:'semicolon' },
+    spacing:   { icon:'⚠️', text:'padding / margin 常混淆', key:'spacing'   },
+    property:  { icon:'⚠️', text:'屬性名稱錯誤',            key:'property'  },
+    flex:      { icon:'⚠️', text:'Flex 對齊觀念不熟',       key:'flex'      },
+    selector:  { icon:'⚠️', text:'選取器語法需加強',        key:'selector'  },
+  };
+  return sorted.slice(0, 3).map(([key]) => MAP[key] || { icon:'⚠️', text:key, key });
+}
+
+function recordError(type) {
+  userData.errors[type] = (userData.errors[type] || 0) + 1;
+  saveUserData();
+}
+
+let userData = loadUserData();
+
+/* ═══════════════════════════════════════════════════
+   GAME STATE
+═══════════════════════════════════════════════════ */
+let gameState = {
+  level: null,
+  lives: 3,
+  tries: 0,
+  startTime: 0,
+  feedbackVisible: false,
+  previewMode: 'compare',
+  overlayActive: false,
+  acSelected: 0,
+  acItems: [],
+  levelIndex: 0,
+};
+
+/* ═══════════════════════════════════════════════════
+   SCREEN ROUTING
+═══════════════════════════════════════════════════ */
+let currentScreen = 'home';
+
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  currentScreen = name;
+
+  // Bottom nav
+  document.querySelectorAll('.bottom-nav-btn').forEach(b => b.classList.remove('active'));
+  const navMap = { home:'bnav-home', analytics:'bnav-analytics' };
+  if(navMap[name]) document.getElementById(navMap[name]).classList.add('active');
+
+  // Hide bottom nav in game
+  document.getElementById('bottom-nav').style.display = name === 'game' ? 'none' : 'flex';
+
+  if(name === 'analytics') renderAnalytics();
+}
+
+/* ═══════════════════════════════════════════════════
+   HOME RENDER
+═══════════════════════════════════════════════════ */
+function renderHome() {
+  // Streak dots
+  // Show up to 7 dots; filled dots = past days in streak, today dot = last one
+  const WEEK_DAYS = ['一','二','三','四','五','六','日'];
+  const streakDays = document.getElementById('streak-days');
+  document.getElementById('streak-num').textContent = userData.streak;
+  const streak = userData.streak;
+  // Show max 7 dots representing the last N days
+  const showDots = Math.min(streak, 7);
+  let dotsHTML = '';
+  for (let i = 0; i < 7; i++) {
+    let cls = 'streak-dot';
+    let label = WEEK_DAYS[i];
+    if (streak === 0) {
+      // No streak yet
+      cls = 'streak-dot';
+    } else if (i < showDots - 1) {
+      cls = 'streak-dot done';
+      label = '✓';
+    } else if (i === showDots - 1) {
+      cls = 'streak-dot today';
+      label = '✓';
+    }
+    dotsHTML += `<div class="${cls}">${label}</div>`;
+  }
+  streakDays.innerHTML = dotsHTML;
+
+  // Stats
+  const acc = computeAccuracy();
+  document.getElementById('stat-done').textContent = userData.completedLevels.size;
+  document.getElementById('stat-acc').textContent = acc !== null ? acc + '%' : '—';
+  document.getElementById('stat-time').textContent = userData.sessionsToday > 0 ? userData.sessionsToday + '分' : '—';
+
+  // Weaknesses — computed from real error data
+  const weaknesses = computeWeaknesses();
+  if (weaknesses.length === 0) {
+    document.getElementById('weakness-list').innerHTML = '<div style="font-size:13px;color:var(--text3);padding:8px 0;">完成幾關後，這裡會顯示你需要加強的觀念 💪</div>';
+  } else {
+    document.getElementById('weakness-list').innerHTML = weaknesses.map(w =>
+      `<div class="weakness-item" onclick="drillWeakness('${w.key}')">
+        <span class="weakness-icon">${w.icon}</span>
+        <span class="weakness-text">${w.text}</span>
+        <button class="weakness-btn">加強訓練</button>
+      </div>`
+    ).join('');
+  }
+
+  // Chapters — status driven by real userData
+  document.getElementById('chapter-list').innerHTML = CHAPTERS.map(ch => {
+    const status = getChapterStatus(ch.id);
+    const tagMap = {
+      done:   '<span class="chapter-tag tag-done">✓ 完成</span>',
+      active: '<span class="chapter-tag tag-active">進行中</span>',
+      locked: '<span class="chapter-tag tag-locked">🔒 鎖定</span>',
+    };
+    return `<div class="chapter-item ${status === 'locked' ? 'locked' : ''}" onclick="${status !== 'locked' ? `openChapter(${ch.id})` : ''}">
+      <div class="chapter-num ${status}">${status === 'done' ? '✓' : ch.num}</div>
+      <div class="chapter-info">
+        <div class="chapter-name">${ch.icon} ${ch.name}</div>
+        <div class="chapter-desc">${ch.desc}</div>
+      </div>
+      ${tagMap[status] || tagMap.locked}
+    </div>`;
+  }).join('');
+
+  // Badges — earned state from real userData
+  document.getElementById('badges-row').innerHTML = BADGES.map(b =>
+    `<div class="badge-card ${userData.badges.includes(b.id) ? 'earned' : 'locked-badge'}" title="${b.desc}">
+      <span class="badge-emoji">${b.emoji}</span>
+      <div class="badge-name">${b.name}</div>
+    </div>`
+  ).join('');
+
+  renderContinueCard();
+  renderRoadmap();
+}
+
+// Track which chapter tab is selected in the roadmap
+let roadmapSelectedChapter = -1; // -1 = auto (active chapter)
+
+function openActiveChapter() {
+  let activeChId = 0;
+  for (let i = CHAPTERS.length - 1; i >= 0; i--) {
+    const st = getChapterStatus(CHAPTERS[i].id);
+    if (st === 'active') { activeChId = CHAPTERS[i].id; break; }
+  }
+  openChapter(activeChId);
+}
+
+function renderRoadmap() {
+  // Determine which chapter to show
+  if (roadmapSelectedChapter === -1) {
+    // Auto-select: find the active chapter
+    roadmapSelectedChapter = 0;
+    for (let i = CHAPTERS.length - 1; i >= 0; i--) {
+      if (getChapterStatus(CHAPTERS[i].id) === 'active') {
+        roadmapSelectedChapter = CHAPTERS[i].id;
+        break;
+      }
+    }
+  }
+  renderRoadmapTabs();
+  renderRoadmapLevels(roadmapSelectedChapter);
+}
+
+function selectRoadmapChapter(chId) {
+  roadmapSelectedChapter = chId;
+  renderRoadmapTabs();
+  renderRoadmapLevels(chId);
+}
+
+function renderRoadmapTabs() {
+  const tabsEl = document.getElementById('roadmap-tabs');
+  if (!tabsEl) return;
+
+  tabsEl.innerHTML = CHAPTERS.map(ch => {
+    const status   = getChapterStatus(ch.id);
+    const isActive = ch.id === roadmapSelectedChapter;
+    const isDone   = status === 'done';
+    const isLocked = status === 'locked';
+
+    let tabCls = 'roadmap-tab';
+    if (isActive)    tabCls += isDone ? ' tab-done active' : ' active';
+    else if (isDone) tabCls += ' tab-done';
+    else if (isLocked) tabCls += ' tab-preview'; // locked but clickable to preview
+
+    // All chapters are clickable — locked ones show preview (no play)
+    return `<button class="${tabCls}" onclick="selectRoadmapChapter(${ch.id})">第${ch.id + 1}章</button>`;
+  }).join('');
+
+  // Scroll active tab into view
+  const activeTab = tabsEl.querySelector('.roadmap-tab.active');
+  if (activeTab) activeTab.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+}
+
+function renderRoadmapLevels(chId) {
+  const wrap = document.getElementById('roadmap-wrap');
+  if (!wrap) return;
+
+  const ch     = CHAPTERS[chId];
+  const allLvs = ALL_LEVELS.filter(l => l.chapter === chId);
+  const doneN  = allLvs.filter(l => userData.completedLevels.has(l.id)).length;
+  const pct    = allLvs.length ? Math.round(doneN / allLvs.length * 100) : 0;
+  const status = getChapterStatus(chId);
+
+  const SHOW_INLINE = 5;
+  const inline = allLvs.slice(0, SHOW_INLINE);
+  const extra  = allLvs.slice(SHOW_INLINE);
+
+  function lvState(lv) {
+    if (userData.completedLevels.has(lv.id)) return 'rm-done';
+    if (isLevelUnlocked(lv)) {
+      const prevDone = lv.num === 1 || userData.completedLevels.has(
+        ALL_LEVELS.find(l2 => l2.chapter === lv.chapter && l2.num === lv.num - 1)?.id
+      );
+      return prevDone ? 'rm-current' : 'rm-todo';
+    }
+    return 'rm-locked';
+  }
+
+  function diffDots(diff) {
+    return [0,1,2].map(i =>
+      `<span style="color:${i < diff ? 'var(--primary)' : 'var(--border2)'}">●</span>`
+    ).join('');
+  }
+
+  function buildItem(lv) {
+    const state = lvState(lv);
+    const onclick = state !== 'rm-locked' ? `startLevel('${lv.id}')` : '';
+    const dotLabel = state === 'rm-done' ? '✓' : state === 'rm-locked' ? '🔒' : lv.num;
+    const statusLabel = state === 'rm-done' ? '已完成' : state === 'rm-current' ? '👉 建議練習' : state === 'rm-locked' ? '尚未解鎖' : '待挑戰';
+    const statusIcon  = state === 'rm-done' ? '✅' : state === 'rm-current' ? '⚡' : state === 'rm-locked' ? '' : '○';
+    return `<div class="roadmap-item ${state}" onclick="${onclick}">
+      <div class="roadmap-dot">${dotLabel}</div>
+      <div class="roadmap-info">
+        <div class="roadmap-name">關卡 ${lv.num}&ensp;${lv.icon} ${lv.title}</div>
+        <div class="roadmap-meta">${diffDots(lv.diff)}&ensp;${statusLabel}</div>
+      </div>
+      <span class="roadmap-status-icon">${statusIcon}</span>
+    </div>`;
+  }
+
+  // Chapter header with progress
+  let html = `<div class="roadmap-ch-progress">
+    <span>${ch.icon} 第${chId+1}章 ${ch.name}</span>
+    <div class="roadmap-ch-bar"><div class="roadmap-ch-fill" style="width:${pct}%"></div></div>
+    <span style="flex-shrink:0">${doneN}/${allLvs.length}</span>
+  </div>`;
+
+  // Even locked chapters can be previewed (but items are all rm-locked / no click)
+  // So we don't return early — we fall through to render the level list.
+
+  html += '<div class="roadmap-levels">';
+  inline.forEach(lv => { html += buildItem(lv); });
+  html += '</div>';
+
+  if (extra.length > 0) {
+    html += `<details class="roadmap-more">
+      <summary><i class="rm-chevron">▶</i>&ensp;還有 ${extra.length} 個關卡</summary>
+      <div class="roadmap-levels" style="margin-top:8px;">`;
+    extra.forEach(lv => { html += buildItem(lv); });
+    html += '</div></details>';
+  }
+
+  wrap.innerHTML = html;
+}
+
+function renderContinueCard() {
+  // Find the current active chapter and progress
+  let activeChId = 0;
+  for (let i = CHAPTERS.length - 1; i >= 0; i--) {
+    const st = getChapterStatus(CHAPTERS[i].id);
+    if (st === 'active' || st === 'done') { activeChId = CHAPTERS[i].id; break; }
+  }
+  const ch = CHAPTERS[activeChId];
+  const chLevels = ALL_LEVELS.filter(l => l.chapter === activeChId);
+  const doneCnt = chLevels.filter(l => userData.completedLevels.has(l.id)).length;
+  const pct = chLevels.length ? Math.round((doneCnt / chLevels.length) * 100) : 0;
+  document.getElementById('continue-icon').textContent = ch.icon;
+  document.getElementById('continue-chapter').textContent = '第' + (activeChId+1) + '章';
+  document.getElementById('continue-name').textContent = ch.name;
+  document.getElementById('continue-badge').textContent = pct === 100 ? '✅ 完成' : '進行中';
+  document.getElementById('continue-progress').style.width = pct + '%';
+  document.getElementById('continue-done').textContent = doneCnt + ' / ' + chLevels.length + ' 關';
+  document.getElementById('continue-pct').textContent = pct + '%';
+}
+
+function continuePlay() {
+  // Find the first incomplete level in the active chapter
+  let activeChId = 0;
+  for (let i = CHAPTERS.length - 1; i >= 0; i--) {
+    const st = getChapterStatus(CHAPTERS[i].id);
+    if (st === 'active') { activeChId = CHAPTERS[i].id; break; }
+  }
+  const chLevels = ALL_LEVELS.filter(l => l.chapter === activeChId);
+  const nextLevel = chLevels.find(l => !userData.completedLevels.has(l.id) && isLevelUnlocked(l));
+  if (nextLevel) {
+    startLevel(nextLevel.id);
+  } else {
+    openChapter(activeChId);
+  }
+}
+
+function openChapter(chapterId) {
+  const ch = CHAPTERS[chapterId];
+  if(!ch || ch.status === 'locked') return;
+  document.getElementById('chapter-nav-title').textContent = `${ch.num} ${ch.name}`;
+  renderLevelGrid(chapterId);
+  showScreen('chapter');
+  document.getElementById('bnav-learn').classList.add('active');
+}
+
+function renderLevelGrid(chapterId) {
+  const levels = ALL_LEVELS.filter(l => l.chapter === chapterId);
+  document.getElementById('level-grid').innerHTML = levels.map(lv => {
+    const done = userData.completedLevels.has(lv.id);
+    const locked = !done && !isLevelUnlocked(lv);
+    const dots = Array.from({length:3}, (_,i) => `<div class="diff-dot ${i < lv.diff ? 'filled' : ''}"></div>`).join('');
+    return `<div class="level-card ${done ? 'done' : ''} ${locked ? 'locked-card' : ''}"
+      onclick="${locked ? '' : `startLevel('${lv.id}')`}">
+      <div class="level-num">關卡 ${lv.num}</div>
+      <div class="level-title">${lv.icon} ${lv.title}</div>
+      <div class="level-meta">
+        <div class="level-diff">${dots}</div>
+        <span class="level-status">${done ? '✅' : locked ? '🔒' : '▶️'}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function isLevelUnlocked(lv) {
+  if(lv.chapter === 0 && lv.num === 1) return true;
+  // previous level done
+  const prev = ALL_LEVELS.find(l => l.chapter === lv.chapter && l.num === lv.num - 1);
+  if(prev && userData.completedLevels.has(prev.id)) return true;
+  if(lv.num === 1) {
+    // first level of chapter — need previous chapter's first level done
+    const prevChLevel = ALL_LEVELS.find(l => l.chapter === lv.chapter - 1 && l.num === 1);
+    if(prevChLevel && userData.completedLevels.has(prevChLevel.id)) return true;
+  }
+  return userData.completedLevels.has(lv.id);
+}
+
+function drillWeakness(key) {
+  // Find first relevant level
+  const map = { flex: '4-1', semicolon: '0-1', spacing: '2-1' };
+  const lvId = map[key] || '0-1';
+  const lv = ALL_LEVELS.find(l => l.id === lvId);
+  if(lv) startLevel(lv.id);
+}
+
+function scrollToBadges() {
+  showScreen('home');
+  setTimeout(() => {
+    document.getElementById('badges-row').scrollIntoView({ behavior: 'smooth' });
+  }, 100);
+}
+
+/* ═══════════════════════════════════════════════════
+   GAME ENGINE
+═══════════════════════════════════════════════════ */
+function startLevel(levelId) {
+  const lv = ALL_LEVELS.find(l => l.id === levelId);
+  if(!lv) return;
+  gameState.level = lv;
+  gameState.lives = 3;
+  gameState.tries = 0;
+  gameState.startTime = Date.now();
+  gameState.feedbackVisible = false;
+  gameState.previewMode = 'compare';
+  gameState.levelIndex = ALL_LEVELS.indexOf(lv);
+
+  showScreen('game');
+  setupGameUI();
+}
+
+function setupGameUI() {
+  const lv = gameState.level;
+
+  // Nav
+  document.getElementById('game-level-label').textContent = `第${lv.chapter+1}章 · 關卡 ${lv.num}`;
+  document.getElementById('game-mode-badge').innerHTML = getModeLabel(lv.mode);
+
+  // Progress
+  const chLevels = ALL_LEVELS.filter(l => l.chapter === lv.chapter);
+  const pct = ((lv.num - 1) / chLevels.length) * 100;
+  document.getElementById('game-progress-bar').style.width = pct + '%';
+
+  // Lives
+  renderLives();
+
+  // Task
+  document.getElementById('task-icon').textContent = lv.icon;
+  document.getElementById('task-desc').textContent = lv.desc;
+  document.getElementById('hint-text').textContent = lv.designerHint || lv.hint;
+  document.getElementById('hint-text').classList.remove('visible');
+  document.querySelector('.hint-toggle').textContent = '顯示提示';
+
+  // Previews
+  renderPreviews();
+  setPreviewMode('compare');
+
+  // Feedback panel
+  document.getElementById('feedback-panel').classList.remove('visible');
+
+  // Reset submit button, confirm button & preview state from previous level
+  const submitBtn = document.getElementById('btn-submit');
+  if (submitBtn) submitBtn.disabled = false;
+  document.getElementById('feedback-confirm').classList.add('hidden');
+  document.getElementById('feedback-try').classList.add('hidden');
+  document.getElementById('live-preview').classList.remove('match', 'mismatch');
+  document.getElementById('complete-overlay').classList.remove('visible');
+
+  // Mode setup
+  if(lv.mode === 1) {
+    // Choice mode
+    document.getElementById('choices-mode').classList.remove('hidden');
+    document.getElementById('editor-mode').classList.add('hidden');
+    document.getElementById('submit-bar').classList.add('hidden');
+    renderChoices();
+  } else {
+    // Editor mode
+    document.getElementById('choices-mode').classList.add('hidden');
+    document.getElementById('editor-mode').classList.remove('hidden');
+    document.getElementById('submit-bar').classList.remove('hidden');
+    const inp = document.getElementById('code-input');
+    inp.value = lv.baseCSS || '';
+    updateLineNumbers();
+    updateLivePreview();
+  }
+
+  // Shortcuts
+  renderShortcuts();
+}
+
+function getModeLabel(mode) {
+  const labels = ['','<span class="mode-badge mode-1">選擇題</span>','<span class="mode-badge mode-2">填入模式</span>','<span class="mode-badge mode-3">提示模式</span>','<span class="mode-badge mode-4">自由模式</span>'];
+  return labels[mode] || '';
+}
+
+function renderLives() {
+  const el = document.getElementById('game-lives');
+  el.innerHTML = Array.from({length: 3}, (_,i) =>
+    `<span class="life-icon ${i >= gameState.lives ? 'lost' : ''}">❤️</span>`
+  ).join('');
+}
+
+/* ───── Preview ───── */
+function getPreviewHTML(style, lv) {
+  const html = lv.htmlTemplate.replace(/STYLE_INJECT/g, style || '');
+  return `<!DOCTYPE html><html><head><style>*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,sans-serif;}body{height:100vh;overflow:hidden;}</style></head><body>${html}</body></html>`;
+}
+
+function renderPreviews() {
+  const lv = gameState.level;
+  const targetFrame = document.getElementById('target-iframe');
+  const liveFrame = document.getElementById('live-iframe');
+  targetFrame.srcdoc = getPreviewHTML(lv.targetStyle, lv);
+  liveFrame.srcdoc = getPreviewHTML(lv.baseStyle, lv);
+}
+
+function updateLivePreview() {
+  const lv = gameState.level;
+  const css = document.getElementById('code-input').value;
+  // Extract style from textarea (simplified — extract inline styles from properties)
+  const liveStyle = extractInlineStyle(css, lv);
+  const liveFrame = document.getElementById('live-iframe');
+  liveFrame.srcdoc = getPreviewHTML(liveStyle, lv);
+}
+
+function extractInlineStyle(cssText, lv) {
+  // Parse simple CSS and extract properties as inline style
+  const props = {};
+  const baseProps = parseInlineStyle(lv.baseStyle);
+  Object.assign(props, baseProps);
+  // Parse the editor CSS
+  const matches = cssText.match(/\{([^}]*)\}/);
+  if(matches) {
+    const inner = matches[1];
+    const lines = inner.split(';');
+    lines.forEach(line => {
+      const [k, v] = line.split(':').map(s => s.trim());
+      if(k && v) props[k] = v;
+    });
+  } else {
+    // No braces — treat the whole thing as inline
+    const lines = cssText.split(';');
+    lines.forEach(line => {
+      const [k, v] = line.split(':').map(s => s.trim());
+      if(k && v) props[k] = v;
+    });
+  }
+  return Object.entries(props).map(([k,v]) => `${k}:${v}`).join(';');
+}
+
+function parseInlineStyle(str) {
+  const obj = {};
+  str.split(';').forEach(p => {
+    const [k, v] = p.split(':').map(s => s.trim());
+    if(k && v) obj[k] = v;
+  });
+  return obj;
+}
+
+function setPreviewMode(mode) {
+  gameState.previewMode = mode;
+  ['compare','target','live'].forEach(m => {
+    document.getElementById('tab-'+m).classList.toggle('active', m === mode);
+  });
+  const t = document.getElementById('target-preview');
+  const l = document.getElementById('live-preview');
+  if(mode === 'compare') {
+    t.style.display = ''; l.style.display = '';
+  } else if(mode === 'target') {
+    t.style.display = ''; l.style.display = 'none';
+    t.style.flex = '1';
+  } else {
+    t.style.display = 'none'; l.style.display = '';
+    l.style.flex = '1';
+  }
+}
+
+function toggleOverlay() {
+  gameState.overlayActive = !gameState.overlayActive;
+  document.getElementById('overlay-btn').classList.toggle('active', gameState.overlayActive);
+  // simple visual effect on live preview
+  const liveBox = document.getElementById('live-preview');
+  liveBox.style.opacity = gameState.overlayActive ? '0.65' : '1';
+}
+
+/* ───── Choice Mode ───── */
+function renderChoices() {
+  const lv = gameState.level;
+  const grid = document.getElementById('choices-grid');
+  // Shuffle choices
+  const shuffled = [...lv.choices].sort(() => Math.random() - 0.5);
+  grid.innerHTML = shuffled.map((c, i) =>
+    `<button class="choice-btn" onclick="selectChoice(${i})" id="choice-${i}">${c.text}</button>`
+  ).join('');
+  // Store shuffled
+  gameState.shuffledChoices = shuffled;
+}
+
+function selectChoice(idx) {
+  const choice = gameState.shuffledChoices[idx];
+  const btns = document.querySelectorAll('.choice-btn');
+  btns.forEach(b => b.disabled = true);
+
+  userData.totalAttempts++;
+  if(choice.correct) {
+    userData.totalCorrect++;
+    document.getElementById('choice-'+idx).classList.add('correct');
+    userData.completedLevels.add(gameState.level.id);
+    checkAndAwardBadges();
+    saveUserData();
+    showFeedback('success', '答對了！✨', choice.why || gameState.level.successMsg, gameState.level.successWhy);
+    const lv = gameState.level;
+    document.getElementById('live-iframe').srcdoc = getPreviewHTML(lv.targetStyle, lv);
+    document.getElementById('live-preview').classList.add('match');
+    document.getElementById('feedback-confirm').classList.remove('hidden');
+  } else {
+    document.getElementById('choice-'+idx).classList.add('wrong');
+    gameState.lives = Math.max(0, gameState.lives - 1);
+    renderLives();
+    gameState.tries++;
+    recordError('property');
+    const lv = gameState.level;
+    showFeedback('error', '不太對喔', choice.why || '試試其他選項吧！', null);
+    // Shake
+    document.getElementById('choices-grid').classList.add('shake');
+    setTimeout(() => document.getElementById('choices-grid').classList.remove('shake'), 400);
+    // Re-enable after delay
+    setTimeout(() => {
+      btns.forEach(b => { b.disabled = false; b.classList.remove('wrong'); });
+      closeFeedback();
+    }, 1800);
+  }
+}
+
+/* ───── Editor Mode ───── */
+function onCodeInput() {
+  updateLineNumbers();
+  updateLivePreview();
+  showAutocomplete();
+}
+
+function updateLineNumbers() {
+  const inp = document.getElementById('code-input');
+  const lines = inp.value.split('\n');
+  const container = document.getElementById('code-lines');
+  container.innerHTML = lines.map((_, i) =>
+    `<div class="code-line-num">${i+1}</div>`
+  ).join('');
+}
+
+function onCodeKeydown(e) {
+  const inp = document.getElementById('code-input');
+  const ac = document.getElementById('autocomplete');
+
+  if(ac.classList.contains('visible')) {
+    if(e.key === 'ArrowDown') {
+      e.preventDefault();
+      gameState.acSelected = Math.min(gameState.acSelected+1, gameState.acItems.length-1);
+      highlightAC();
+    } else if(e.key === 'ArrowUp') {
+      e.preventDefault();
+      gameState.acSelected = Math.max(gameState.acSelected-1, 0);
+      highlightAC();
+    } else if(e.key === 'Enter' || e.key === 'Tab') {
+      e.preventDefault();
+      applyAutocomplete(gameState.acSelected);
+    } else if(e.key === 'Escape') {
+      hideAutocomplete();
+    }
+    return;
+  }
+
+  // Tab = indent
+  if(e.key === 'Tab') {
+    e.preventDefault();
+    const start = inp.selectionStart;
+    const end = inp.selectionEnd;
+    inp.value = inp.value.substring(0, start) + '  ' + inp.value.substring(end);
+    inp.selectionStart = inp.selectionEnd = start + 2;
+    onCodeInput();
+  }
+  // Enter = auto-indent
+  if(e.key === 'Enter') {
+    const start = inp.selectionStart;
+    const before = inp.value.substring(0, start);
+    const lastLine = before.split('\n').pop();
+    const indent = lastLine.match(/^(\s*)/)[1];
+    const extra = before.endsWith('{') ? '  ' : '';
+    setTimeout(() => {
+      const newStart = inp.selectionStart;
+      inp.value = inp.value.substring(0, newStart) + indent + extra + inp.value.substring(newStart);
+      inp.selectionStart = inp.selectionEnd = newStart + indent.length + extra.length;
+      onCodeInput();
+    }, 0);
+  }
+}
+
+function syncScroll() {
+  const inp = document.getElementById('code-input');
+  document.getElementById('code-lines').style.transform = `translateY(-${inp.scrollTop}px)`;
+  // Reposition the autocomplete if it's open
+  const ac = document.getElementById('autocomplete');
+  if (ac.classList.contains('visible')) showAutocomplete();
+}
+
+/* ───── Autocomplete ───── */
+function showAutocomplete() {
+  const inp = document.getElementById('code-input');
+  const pos = inp.selectionStart;
+  const before = inp.value.substring(0, pos);
+  const lastLine = before.split('\n').pop();
+  const trimmed = lastLine.trim();
+  if(!trimmed || trimmed.length < 1) { hideAutocomplete(); return; }
+
+  const items = CSS_COMPLETIONS.filter(c =>
+    c.prop.startsWith(trimmed) || c.full.toLowerCase().includes(trimmed.toLowerCase())
+  ).slice(0, 6);
+
+  if(!items.length) { hideAutocomplete(); return; }
+  gameState.acItems = items;
+  gameState.acSelected = 0;
+
+  const ac = document.getElementById('autocomplete');
+  ac.innerHTML = items.map((item, i) =>
+    `<div class="autocomplete-item ${i===0?'selected':''}" onclick="applyAutocomplete(${i})">
+      <span><span class="ac-prop">${item.prop}</span>: <span class="ac-val">${item.val}</span>;</span>
+      <span class="ac-desc">${item.desc}</span>
+    </div>`
+  ).join('');
+
+  // ── Smart positioning (fixed, so never clipped) ──────────────────
+  const LINE_H = 22;   // matches CSS line-height of .code-input
+  const PAD_T  = 12;   // padding-top of .code-input
+
+  const inputRect = inp.getBoundingClientRect();
+
+  // Which visual line is the cursor on? (0-based, accounting for scroll)
+  const linesBefore   = inp.value.substring(0, inp.selectionStart).split('\n');
+  const cursorLineIdx = linesBefore.length - 1;
+  const cursorTopInInput  = PAD_T + cursorLineIdx * LINE_H - inp.scrollTop;
+
+  // Clamp so cursor position stays within the visible textarea area
+  const clampedTop = Math.max(0, Math.min(cursorTopInInput, inputRect.height - LINE_H));
+
+  // Screen-space positions
+  const cursorScreenTop    = inputRect.top  + clampedTop;
+  const cursorScreenBottom = cursorScreenTop + LINE_H;
+  const cursorScreenLeft   = inputRect.left + 44 + 16; // gutter(44) + left padding(16)
+
+  // Estimate dropdown height
+  const acHeight = Math.min(gameState.acItems.length, 6) * 38 + 8;
+  const spaceBelow = window.innerHeight - cursorScreenBottom - 8;
+  const spaceAbove = cursorScreenTop - 8;
+
+  ac.style.left   = Math.min(cursorScreenLeft, window.innerWidth - 256) + 'px';
+  ac.style.right  = 'auto';
+  ac.style.maxHeight = Math.min(acHeight, 220) + 'px';
+
+  if (spaceBelow >= acHeight || spaceBelow >= spaceAbove) {
+    // Open downward
+    ac.style.top    = cursorScreenBottom + 4 + 'px';
+    ac.style.bottom = 'auto';
+  } else {
+    // Open upward
+    ac.style.bottom = window.innerHeight - cursorScreenTop + 4 + 'px';
+    ac.style.top    = 'auto';
+  }
+
+  ac.classList.add('visible');
+}
+
+function highlightAC() {
+  document.querySelectorAll('.autocomplete-item').forEach((el, i) => {
+    el.classList.toggle('selected', i === gameState.acSelected);
+  });
+}
+
+function applyAutocomplete(idx) {
+  const item = gameState.acItems[idx];
+  if(!item) return;
+  const inp = document.getElementById('code-input');
+  const pos = inp.selectionStart;
+  const before = inp.value.substring(0, pos);
+  const after = inp.value.substring(pos);
+  const lines = before.split('\n');
+  const lastLine = lines[lines.length - 1];
+  const trimmed = lastLine.trim();
+  const indent = lastLine.match(/^(\s*)/)[1];
+  lines[lines.length - 1] = indent + item.full;
+  inp.value = lines.join('\n') + after;
+  inp.selectionStart = inp.selectionEnd = lines.join('\n').length;
+  hideAutocomplete();
+  onCodeInput();
+}
+
+function hideAutocomplete() {
+  document.getElementById('autocomplete').classList.remove('visible');
+}
+
+/* ───── Shortcuts ───── */
+function renderShortcuts() {
+  document.getElementById('shortcut-bar').innerHTML = SHORTCUTS.map(k =>
+    `<button class="shortcut-key" onclick="insertShortcut('${k}')">${k}</button>`
+  ).join('');
+}
+
+function insertShortcut(char) {
+  const inp = document.getElementById('code-input');
+  const start = inp.selectionStart;
+  const end = inp.selectionEnd;
+  inp.value = inp.value.substring(0, start) + char + inp.value.substring(end);
+  inp.selectionStart = inp.selectionEnd = start + char.length;
+  inp.focus();
+  onCodeInput();
+}
+
+/* ───── Submit ───── */
+function submitAnswer() {
+  const lv = gameState.level;
+  const css = document.getElementById('code-input').value;
+  gameState.tries++;
+
+  let correct = false;
+  if(lv.validate) {
+    correct = lv.validate(css);
+  } else {
+    // Default: check target CSS properties exist
+    correct = checkCSSSimilarity(css, lv.targetCSS);
+  }
+
+  userData.totalAttempts++;
+  if(correct) {
+    userData.totalCorrect++;
+    userData.completedLevels.add(lv.id);
+    checkAndAwardBadges();
+    document.getElementById('live-preview').classList.add('match');
+    document.getElementById('live-iframe').srcdoc = getPreviewHTML(lv.targetStyle, lv);
+    showFeedback('success', '答對了！🎉', lv.successMsg, lv.successWhy);
+    document.getElementById('feedback-confirm').classList.remove('hidden');
+    document.getElementById('feedback-try').classList.add('hidden');
+    document.getElementById('btn-submit').disabled = true;
+    saveUserData();
+  } else {
+    gameState.lives = Math.max(0, gameState.lives - 1);
+    renderLives();
+    const errorMsg = getErrorMessage(css, lv);
+    // Record error type
+    const errType = detectErrorType(css, lv);
+    recordError(errType);
+    showFeedback('error', '還差一點 😅', errorMsg, null);
+    document.getElementById('feedback-next').classList.add('hidden');
+    document.getElementById('feedback-try').classList.remove('hidden');
+    document.getElementById('code-input').classList.add('shake');
+    setTimeout(() => document.getElementById('code-input').classList.remove('shake'), 400);
+  }
+}
+
+function checkCSSSimilarity(userCSS, targetCSS) {
+  // Extract key properties from target
+  const targetProps = {};
+  const tMatches = targetCSS.match(/([a-z-]+)\s*:\s*([^;]+);/g) || [];
+  tMatches.forEach(m => {
+    const [k,v] = m.replace(';','').split(':').map(s=>s.trim());
+    if(k) targetProps[k] = v;
+  });
+
+  const userProps = {};
+  const uMatches = userCSS.match(/([a-z-]+)\s*:\s*([^;]+);/g) || [];
+  uMatches.forEach(m => {
+    const [k,v] = m.replace(';','').split(':').map(s=>s.trim());
+    if(k) userProps[k] = v;
+  });
+
+  // Check if all target props are in user
+  const keys = Object.keys(targetProps);
+  if(!keys.length) return false;
+  return keys.every(k => userProps[k] !== undefined);
+}
+
+function getErrorMessage(css, lv) {
+  if(!css.includes(';')) return '記得每行 CSS 結尾都要加分號 ; 喔！就像句點一樣。';
+  if(css.includes('margin') && lv.targetCSS.includes('padding')) return 'margin 是元件外面的距離，現在需要的是裡面的距離（padding）。';
+  if(css.includes('padding') && lv.targetCSS.includes('margin')) return 'padding 是元件裡面的距離，現在需要的是外面的距離（margin）。';
+  if(css.includes('font-size') && lv.targetCSS.includes('text-align')) return '這個屬性會改變字體大小，但客戶要求的是對齊方式（text-align）。';
+  return '樣式還沒完全符合目標喔，再看看目標預覽，仔細比較哪裡不一樣。';
+}
+
+function detectErrorType(css, lv) {
+  if(!css.includes(';')) return 'semicolon';
+  if(css.includes('margin') && lv.targetCSS.includes('padding')) return 'spacing';
+  if(css.includes('padding') && lv.targetCSS.includes('margin')) return 'spacing';
+  if(!css.includes('{') && lv.mode >= 2) return 'selector';
+  return 'property';
+}
+
+function checkAndAwardBadges() {
+  const done = userData.completedLevels;
+  // First step
+  if (done.size >= 1 && !userData.badges.includes('first_step')) {
+    userData.badges.push('first_step');
+  }
+  // Streak 3
+  if (userData.streak >= 3 && !userData.badges.includes('streak3')) {
+    userData.badges.push('streak3');
+  }
+  // Text chapter done (chapter 1, all 5 levels)
+  const textLevels = ALL_LEVELS.filter(l => l.chapter === 1);
+  if (textLevels.every(l => done.has(l.id)) && !userData.badges.includes('text_chapter')) {
+    userData.badges.push('text_chapter');
+  }
+  // Speed run — checked in showCompleteOverlay
+}
+
+function resetEditor() {
+  const lv = gameState.level;
+  if(!lv) return;
+  document.getElementById('code-input').value = lv.baseCSS || '';
+  updateLineNumbers();
+  updateLivePreview();
+  document.getElementById('live-preview').classList.remove('match', 'mismatch');
+  closeFeedback();
+  document.getElementById('btn-submit').disabled = false;
+  hideAutocomplete();
+}
+
+/* ───── Feedback ───── */
+function showFeedback(type, title, body, why) {
+  const panel = document.getElementById('feedback-panel');
+  const icons = { success:'✅', error:'❌', warn:'⚠️' };
+  document.getElementById('feedback-icon').textContent = icons[type];
+  document.getElementById('feedback-title').textContent = title;
+  document.getElementById('feedback-body').textContent = body;
+  const whyEl = document.getElementById('feedback-why');
+  if(why) { whyEl.innerHTML = why; whyEl.style.display = ''; }
+  else { whyEl.style.display = 'none'; }
+  panel.className = 'feedback-panel ' + type;
+  panel.classList.add('visible');
+  gameState.feedbackVisible = true;
+}
+
+function closeFeedback() {
+  document.getElementById('feedback-panel').classList.remove('visible');
+  gameState.feedbackVisible = false;
+}
+
+function onFeedbackConfirm() {
+  // User has read the explanation — now show the completion overlay
+  closeFeedback();
+  showCompleteOverlay();
+}
+
+function toggleHint() {
+  const txt = document.getElementById('hint-text');
+  const toggle = document.querySelector('.hint-toggle');
+  const visible = txt.classList.toggle('visible');
+  toggle.textContent = visible ? '隱藏提示' : '顯示提示';
+}
+
+/* ───── Level Complete ───── */
+function showCompleteOverlay() {
+  const elapsed = Math.round((Date.now() - gameState.startTime) / 1000);
+  const stars = gameState.tries <= 1 ? 3 : gameState.tries <= 3 ? 2 : 1;
+  const xp = stars * 20 + 10;
+
+  const emojis = ['🎉','⭐','🚀','✨','🏆'];
+  document.getElementById('complete-emoji').textContent = emojis[Math.floor(Math.random()*emojis.length)];
+  document.getElementById('complete-title').textContent = stars === 3 ? '完美通關！' : stars === 2 ? '很棒！' : '通關了！';
+  document.getElementById('complete-sub').textContent = gameState.level.successMsg || '你成功完成了這一關！';
+  document.getElementById('cstat-time').textContent = elapsed + 's';
+  document.getElementById('cstat-tries').textContent = gameState.tries;
+  document.getElementById('cstat-xp').textContent = '+' + xp;
+
+  // Stars
+  const starsEl = document.getElementById('complete-stars');
+  starsEl.innerHTML = Array.from({length:3}, (_,i) => `<span class="complete-star ${i<stars?'lit':''}">⭐</span>`).join('');
+
+  userData.totalXP += xp;
+  // Speedrun badge
+  if (elapsed <= 60 && !userData.badges.includes('speedrun')) {
+    userData.badges.push('speedrun');
+  }
+  recordPlaySession();
+  saveUserData();
+
+  const overlay = document.getElementById('complete-overlay');
+  overlay.classList.add('visible');
+  // Animate stars
+  starsEl.querySelectorAll('.complete-star.lit').forEach((s, i) => {
+    s.style.opacity = '0';
+    s.style.transform = 'scale(0.5)';
+    setTimeout(() => {
+      s.style.transition = 'all 0.3s cubic-bezier(0.34,1.56,0.64,1)';
+      s.style.opacity = '1';
+      s.style.transform = 'scale(1)';
+    }, 400 + i * 150);
+  });
+}
+
+function nextLevel() {
+  document.getElementById('complete-overlay').classList.remove('visible');
+  closeFeedback();
+
+  const allChLevels = ALL_LEVELS.filter(l => l.chapter === gameState.level.chapter);
+  const idx = allChLevels.indexOf(gameState.level);
+  const next = allChLevels[idx + 1];
+  if(next) {
+    startLevel(next.id);
+  } else {
+    // Chapter done!
+    const doneChId = gameState.level.chapter;
+    userData.chapterStatus[doneChId] = 'done';
+    const nextChId = doneChId + 1;
+    if (nextChId < CHAPTERS.length && getChapterStatus(nextChId) === 'locked') {
+      userData.chapterStatus[nextChId] = 'active';
+    }
+    saveUserData();
+    showScreen('home');
+    renderHome();
+  }
+}
+
+function replayLevel() {
+  document.getElementById('complete-overlay').classList.remove('visible');
+  startLevel(gameState.level.id);
+}
+
+function confirmLeave() {
+  // Build a custom in-page dialog instead of browser confirm (better UX on mobile)
+  showLeaveDialog();
+}
+
+function showLeaveDialog() {
+  const existing = document.getElementById('leave-dialog');
+  if (existing) existing.remove();
+  const dlg = document.createElement('div');
+  dlg.id = 'leave-dialog';
+  dlg.style.cssText = 'position:fixed;inset:0;background:rgba(9,15,28,0.88);backdrop-filter:blur(8px);z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;';
+  dlg.innerHTML = `
+    <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:24px;max-width:300px;width:100%;text-align:center;">
+      <div style="font-size:40px;margin-bottom:12px;">🚪</div>
+      <div style="font-family:var(--font-display);font-size:18px;font-weight:700;margin-bottom:8px;">退出關卡？</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.6;">你的完成進度已自動儲存。<br>未完成的本關不計入記錄。</div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="closeLeaveDialog()" style="flex:1;height:40px;border-radius:10px;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;">繼續練習</button>
+        <button onclick="doLeave()" style="flex:1;height:40px;border-radius:10px;background:var(--error);color:#fff;font-size:13px;font-weight:700;cursor:pointer;">確定退出</button>
+      </div>
+    </div>`;
+  document.body.appendChild(dlg);
+}
+
+function closeLeaveDialog() {
+  const dlg = document.getElementById('leave-dialog');
+  if (dlg) dlg.remove();
+}
+
+function doLeave() {
+  closeLeaveDialog();
+  document.getElementById('complete-overlay').classList.remove('visible');
+  saveUserData();
+  showScreen('home');
+  renderHome();
+}
+
+/* ═══════════════════════════════════════════════════
+   ANALYTICS
+═══════════════════════════════════════════════════ */
+function renderAnalytics() {
+  // Error breakdown — from real data
+  const errEntries = Object.entries(userData.errors || {}).sort((a,b)=>b[1]-a[1]);
+  const ERR_LABEL_MAP = {
+    semicolon: '漏掉分號',
+    spacing:   'padding/margin 混淆',
+    property:  '屬性名稱錯誤',
+    selector:  '選取器語法',
+    flex:      'Flex 對齊觀念',
+  };
+  if (errEntries.length === 0) {
+    document.getElementById('error-breakdown').innerHTML = '<div style="font-size:13px;color:var(--text3);padding:4px 0;">還沒有錯誤記錄，繼續加油！</div>';
+  } else {
+    const errMax = Math.max(...errEntries.map(e=>e[1]));
+    document.getElementById('error-breakdown').innerHTML = errEntries.slice(0,5).map(([k,v]) =>
+      `<div class="error-row">
+        <div class="error-label">${ERR_LABEL_MAP[k] || k}</div>
+        <div class="error-bar-wrap"><div class="error-bar-fill" style="width:${Math.round((v/errMax)*100)}%"></div></div>
+        <div class="error-count">${v}</div>
+      </div>`
+    ).join('');
+  }
+
+  // Week chart — show actual sessions (use sessionsToday for today's bar)
+  const weekLabels = ['一','二','三','四','五','六','日'];
+  const todayIdx   = (new Date().getDay() + 6) % 7; // Mon=0
+  const weekVals   = weekLabels.map((_,i) => i === todayIdx ? userData.sessionsToday : 0);
+  const weekMax    = Math.max(...weekVals, 1);
+  document.getElementById('week-chart').innerHTML = weekLabels.map((d,i) =>
+    `<div class="chart-bar-col">
+      <div class="chart-bar" style="height:${Math.round((weekVals[i]/weekMax)*70)}px;opacity:${i===todayIdx?1:0.3}"></div>
+      <div class="chart-bar-lbl">${d}</div>
+    </div>`
+  ).join('');
+
+  // Weakness
+  const weaks = computeWeaknesses();
+  if (weaks.length === 0) {
+    document.getElementById('analytics-weakness').innerHTML = '<div style="font-size:13px;color:var(--text3);padding:4px 0;">完成幾關後，這裡會顯示你的弱點 💪</div>';
+  } else {
+    document.getElementById('analytics-weakness').innerHTML = weaks.map(w =>
+      `<div class="weakness-item" onclick="drillWeakness('${w.key}')">
+        <span class="weakness-icon">${w.icon}</span>
+        <span class="weakness-text">${w.text}</span>
+        <button class="weakness-btn">加強訓練</button>
+      </div>`
+    ).join('');
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  userData = loadUserData(); // ensure fresh load
+  recordVisit();             // mark today as visited (for streak)
+  renderHome();
+  // Prevent zoom on double-tap iOS
+  let lastTap = 0;
+  document.addEventListener('touchend', (e) => {
+    const now = Date.now();
+    if(now - lastTap < 300) e.preventDefault();
+    lastTap = now;
+  }, { passive: false });
+  // Hide autocomplete on outside click
+  document.addEventListener('click', (e) => {
+    if(!e.target.closest('.code-editor-wrap')) hideAutocomplete();
+  });
+  // Handle keyboard on mobile
+  window.addEventListener('resize', () => {
+    if(currentScreen === 'game') {
+      // When keyboard pops up on mobile
+      document.getElementById('game-body').style.maxHeight = window.innerHeight - 54 + 'px';
+    }
+  });
+});
+</script>
+</body>
+</html>
