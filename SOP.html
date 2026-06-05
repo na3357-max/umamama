@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>網站製作 SOP 流程文件</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#FAFAF8;
+  --surface:#FFFFFF;
+  --border:#E8E6E0;
+  --border-light:#F0EEE8;
+  --text:#1A1917;
+  --text-secondary:#6B6960;
+  --text-tertiary:#9C9A94;
+  --blue-fill:#EBF3FC;
+  --blue-text:#0C447C;
+  --blue-mid:#378ADD;
+  --teal-fill:#E4F5EE;
+  --teal-text:#085041;
+  --teal-mid:#1D9E75;
+  --amber-fill:#FBF0DE;
+  --amber-text:#633806;
+  --amber-mid:#BA7517;
+  --gray-fill:#F1EFE8;
+  --gray-text:#444441;
+  --mono:'DM Mono',monospace;
+  --sans:'Noto Sans TC',sans-serif;
+}
+html{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.7}
+
+body{max-width:780px;margin:0 auto;padding:48px 32px 80px}
+
+/* HEADER */
+.doc-header{padding-bottom:28px;border-bottom:1px solid var(--border);margin-bottom:40px}
+.doc-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--text-tertiary);margin-bottom:14px}
+.doc-title{font-size:32px;font-weight:500;line-height:1.15;color:var(--text);margin-bottom:8px}
+.doc-sub{font-size:13px;color:var(--text-secondary);margin-bottom:18px}
+.pill-row{display:flex;gap:6px;flex-wrap:wrap}
+.pill{font-size:11px;font-family:var(--mono);padding:4px 10px;border-radius:20px;border:1px solid var(--border);color:var(--text-secondary);background:var(--surface)}
+
+/* STAT CARDS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:48px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px}
+.stat-num{font-size:28px;font-weight:500;font-family:var(--mono);line-height:1;margin-bottom:4px}
+.stat-label{font-size:11px;color:var(--text-tertiary)}
+
+/* SECTION DIVIDER */
+.sec-divider{display:flex;align-items:center;gap:14px;margin-bottom:20px;margin-top:48px}
+.sec-divider:first-of-type{margin-top:0}
+.sec-tag{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--text-tertiary);white-space:nowrap}
+.sec-line{flex:1;height:1px;background:var(--border-light)}
+
+/* PHASE TIMELINE */
+.timeline{position:relative}
+.phase{display:grid;grid-template-columns:20px 1fr;gap:16px;margin-bottom:8px;position:relative}
+.phase:not(:last-child) .phase-line{position:absolute;left:9px;top:32px;bottom:-8px;width:1px;background:var(--border)}
+.phase-dot-wrap{padding-top:12px;display:flex;justify-content:center}
+.phase-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.phase-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px;cursor:pointer;transition:border-color .15s}
+.phase-card:hover{border-color:#C8C6C0}
+.phase-card.warn-border{border-color:#E8C98A}
+.phase-top{display:flex;align-items:center;gap:10px}
+.phase-name{font-size:14px;font-weight:500;flex:1}
+.badges{display:flex;gap:5px;flex-wrap:wrap}
+.badge{font-size:10px;font-family:var(--mono);padding:2px 8px;border-radius:3px;font-weight:500;white-space:nowrap}
+.b-blue{background:var(--blue-fill);color:var(--blue-text)}
+.b-teal{background:var(--teal-fill);color:var(--teal-text)}
+.b-gray{background:var(--gray-fill);color:var(--gray-text)}
+.b-amber{background:var(--amber-fill);color:var(--amber-text)}
+.toggle-btn{font-size:11px;font-family:var(--mono);color:var(--text-tertiary);display:flex;align-items:center;gap:4px;margin-top:8px;user-select:none}
+.toggle-btn .arrow{transition:transform .2s;display:inline-block}
+.toggle-btn.open .arrow{transform:rotate(180deg)}
+.phase-body{display:none;margin-top:14px;border-top:1px solid var(--border-light);padding-top:14px}
+.phase-body.show{display:block}
+
+/* TASKS */
+.task-list{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.task{display:flex;align-items:baseline;gap:8px;font-size:12.5px;color:var(--text-secondary);line-height:1.55}
+.task-mark{width:3px;height:3px;border-radius:50%;background:var(--border);flex-shrink:0;margin-top:6px}
+.task b{font-weight:500;color:var(--text)}
+
+/* ALERTS */
+.alert{font-size:12px;padding:8px 12px;border-radius:6px;line-height:1.65;margin-top:10px}
+.alert-warn{background:var(--amber-fill);color:var(--amber-text)}
+.alert-info{background:var(--blue-fill);color:var(--blue-text)}
+.alert-ok{background:var(--teal-fill);color:var(--teal-text)}
+
+/* TABLE */
+.tbl-wrap{margin-top:10px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{font-weight:500;color:var(--text-tertiary);font-family:var(--mono);font-size:10px;letter-spacing:.08em;padding:6px 10px;text-align:left;border-bottom:1px solid var(--border)}
+td{padding:7px 10px;color:var(--text-secondary);border-bottom:1px solid var(--border-light);vertical-align:top}
+td:first-child{color:var(--text);font-weight:500;white-space:nowrap}
+tr:last-child td{border-bottom:none}
+
+/* SYNC GRID */
+.sync-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.sync-card{background:var(--bg);border:1px solid var(--border-light);border-radius:7px;padding:12px 14px}
+.sync-label{font-size:10px;font-family:var(--mono);letter-spacing:.1em;color:var(--text-tertiary);margin-bottom:8px}
+
+/* OPEN QUESTIONS */
+.oq-wrap{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.oq-row{display:flex;align-items:baseline;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border-light)}
+.oq-row:last-child{border-bottom:none}
+.oq-n{font-family:var(--mono);font-size:11px;color:var(--text-tertiary);width:16px;flex-shrink:0}
+.oq-q{font-size:13px;color:var(--text);flex:1}
+.oq-tag{font-size:10px;font-family:var(--mono);color:var(--text-tertiary);padding:2px 7px;border:1px solid var(--border);border-radius:3px;white-space:nowrap}
+
+/* PRINT */
+@media print{
+  body{padding:24px;max-width:100%}
+  .phase-body{display:block!important}
+  .toggle-btn{display:none}
+  .phase-card{border:1px solid #ddd;break-inside:avoid}
+}
+@media(max-width:600px){
+  body{padding:24px 18px 60px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .sync-grid{grid-template-columns:1fr}
+  .doc-title{font-size:24px}
+}
+</style>
+</head>
+<body>
+
+<div class="doc-header">
+  <div class="doc-eyebrow">INTERNAL SOP · 網站製作流程</div>
+  <div class="doc-title">模板型網站製作<br>作業標準流程</div>
+  <div class="doc-sub">小工匠後台 · CSS 客製化 · 功能模組</div>
+  <div class="pill-row">
+    <span class="pill">設計師</span>
+    <span class="pill">規劃師</span>
+    <span class="pill">工程師</span>
+    <span class="pill">7 個階段</span>
+    <span class="pill">2 次客戶審稿</span>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat">
+    <div class="stat-num" style="color:var(--blue-mid)">7</div>
+    <div class="stat-label">作業階段</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num" style="color:var(--amber-mid)">2</div>
+    <div class="stat-label">客戶確認節點</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num" style="color:var(--teal-mid)">2</div>
+    <div class="stat-label">可同步進行段</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num" style="color:#888780">4</div>
+    <div class="stat-label">待確認問題</div>
+  </div>
+</div>
+
+<div class="sec-divider"><span class="sec-tag">FLOW</span><div class="sec-line"></div></div>
+
+<div class="timeline">
+
+  <div class="phase">
+    <div class="phase-line"></div>
+    <div class="phase-dot-wrap"><div class="phase-dot" style="background:var(--blue-mid)"></div></div>
+    <div>
+      <div class="phase-card" onclick="tog(this)">
+        <div class="phase-top">
+          <div class="phase-name">專案啟動</div>
+          <div class="badges">
+            <span class="badge b-blue">設計師</span>
+            <span class="badge b-gray">工程師</span>
+          </div>
+        </div>
+        <div class="toggle-btn"><span class="arrow">↓</span> 展開細項</div>
+        <div class="phase-body">
+          <div class="task-list">
+            <div class="task"><div class="task-mark"></div><b>設計師</b> 排稿、拿到網址單</div>
+            <div class="task"><div class="task-mark"></div><b>設計師</b> 網址單上寫帳號、勾選小工匠、簽名 → 放至集中處</div>
+            <div class="task"><div class="task-mark"></div><b>設計師</b> 線上網址單簽名</div>
+            <div class="task"><div class="task-mark"></div><b>設計師</b> 登入小工匠後台開網址</div>
+            <div class="task"><div class="task-mark"></div><b>設計師</b> 將網址小單上的網址貼到後台內 → <b>先儲存</b> → 再按「快速建立」</div>
+            <div class="task"><div class="task-mark"></div><b>工程師</b> 隔天開啟正式網頁</div>
+            <div class="task"><div class="task-mark"></div><b>設計師</b> 確認後台審核狀態 = Y，才代表網址已開啟</div>
+          </div>
+          <div class="alert alert-warn">⚠️ 不可先按「快速建立」！必須先貼網址 → 儲存 → 才按快速建立，否則網址會跑掉，需重新申請</div>
+          <div class="alert alert-warn" style="margin-top:6px">大圖製作起算為第 1 天，時程從這裡開始計算</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-line"></div>
+    <div class="phase-dot-wrap"><div class="phase-dot" style="background:var(--teal-mid)"></div></div>
+    <div>
+      <div class="phase-card" onclick="tog(this)">
+        <div class="phase-top">
+          <div class="phase-name">專案初始化</div>
+          <div class="badges">
+            <span class="badge b-blue">設計師</span>
+            <span class="badge b-teal">規劃師</span>
+            <span class="badge b-teal">可同步進行</span>
+          </div>
+        </div>
+        <div class="toggle-btn"><span class="arrow">↓</span> 展開細項</div>
+        <div class="phase-body">
+          <div class="sync-grid">
+            <div class="sync-card">
+              <div class="sync-label">規劃師 同步確認</div>
+              <div class="task-list">
+                <div class="task"><div class="task-mark"></div>風格表</div>
+                <div class="task"><div class="task-mark"></div>網站架構</div>
+                <div class="task"><div class="task-mark"></div>編輯頁 / 功能頁數量</div>
+                <div class="task"><div class="task-mark"></div>特殊功能需求</div>
+                <div class="task"><div class="task-mark"></div><b>Google 商家</b> — 風格表內若未填寫，優先主動查詢</div>
+              </div>
+              <div class="alert alert-info" style="margin-top:8px">確認無 Google 商家 → 詢問規劃師是否幫忙開設<br>若需開設 → 須另外記錄在結算表內<br>LINE 選單若需製作 → 同樣須另外記錄在結算表</div>
+            </div>
+            <div class="sync-card">
+              <div class="sync-label">設計師 同步準備</div>
+              <div class="task-list">
+                <div class="task"><div class="task-mark"></div>icon — 顯示在<b>瀏覽器頁籤</b>上的小圖示</div>
+                <div class="task"><div class="task-mark"></div>logo — 顯示在<b>網頁首頁</b>上的品牌標誌</div>
+                <div class="task"><div class="task-mark"></div>OG 圖 — 分享連結時在 <b>LINE 等通訊軟體</b>跳出的預覽縮圖</div>
+                <div class="task"><div class="task-mark"></div>小工匠縮圖 — 顯示在<b>店家後台</b>的示意圖，非前台顯示</div>
+                <div class="task"><div class="task-mark"></div>小素材</div>
+              </div>
+            </div>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <tr><th>後續設定項目</th><th>負責</th><th>說明</th></tr>
+              <tr><td>基本資料</td><td>規劃師</td><td>公司名 / 電話 / 地址 / 網址（去掉 https:// 與結尾 /）</td></tr>
+              <tr><td>功能模組開啟</td><td>規劃師</td><td>編輯器 / 文章 / 相簿 / 商品 / 購物車 / 詢價單 / 表單 / 最新消息 / 影片</td></tr>
+            </table>
+          </div>
+          <div class="alert alert-warn">部分功能模組需詢問客戶後才可開啟</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-line"></div>
+    <div class="phase-dot-wrap"><div class="phase-dot" style="background:var(--blue-mid)"></div></div>
+    <div>
+      <div class="phase-card" onclick="tog(this)">
+        <div class="phase-top">
+          <div class="phase-name">CSS 架構建立</div>
+          <div class="badges">
+            <span class="badge b-blue">設計師</span>
+          </div>
+        </div>
+        <div class="toggle-btn"><span class="arrow">↓</span> 展開細項</div>
+        <div class="phase-body">
+          <div class="tbl-wrap">
+            <table>
+              <tr><th>項目</th><th>位置</th></tr>
+              <tr><td>Header CSS</td><td>custom.css</td></tr>
+              <tr><td>Footer CSS</td><td>custom.css（同一條）</td></tr>
+              <tr><td>浮動按鈕</td><td>獨立 .html → 後台「浮動按鈕 Text」貼入</td></tr>
+              <tr><td>複雜浮動效果</td><td>Footer Text</td></tr>
+              <tr><td>Google Font</td><td>Embed code → SEO Head</td></tr>
+              <tr><td>其他程式碼</td><td>SEO Head 或 Footer Text</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-line"></div>
+    <div class="phase-dot-wrap"><div class="phase-dot" style="background:var(--amber-mid)"></div></div>
+    <div>
+      <div class="phase-card warn-border" onclick="tog(this)">
+        <div class="phase-top">
+          <div class="phase-name">第一次審稿 — 大圖審稿</div>
+          <div class="badges">
+            <span class="badge b-blue">設計師</span>
+            <span class="badge b-amber">等客戶確認</span>
+          </div>
+        </div>
+        <div class="toggle-btn"><span class="arrow">↓</span> 展開細項</div>
+        <div class="phase-body">
+          <div class="tbl-wrap">
+            <table>
+              <tr><th>#</th><th>交付項目</th><th>規格</th></tr>
+              <tr><td>1</td><td>Header + 選單 CSS</td><td>—</td></tr>
+              <tr><td>2</td><td>首頁 Banner</td><td>5萬以下 1張 / 15萬以下 2張 / 15萬以上 3張<br>寬 2000px，兩張合計 &lt; 1MB</td></tr>
+              <tr><td>3</td><td>Footer CSS + 公司資訊</td><td>—</td></tr>
+              <tr><td>4</td><td>浮動按鈕</td><td>建立 html → 貼進後台</td></tr>
+              <tr><td>5</td><td>favicon</td><td>轉為 .ico 格式</td></tr>
+              <tr><td>6</td><td>logo</td><td>—</td></tr>
+              <tr><td>7</td><td>og:image</td><td>LINE 分享縮圖</td></tr>
+              <tr><td>8</td><td>小工匠首頁圖</td><td>固定尺寸</td></tr>
+              <tr><td>9</td><td>Google Font</td><td>Embed code → SEO Head</td></tr>
+            </table>
+          </div>
+          <div class="alert alert-info">設計師完成 → 傳網址給規劃師 → 規劃師轉交客戶確認<br>客戶確認後，才進入內頁製作</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-line"></div>
+    <div class="phase-dot-wrap"><div class="phase-dot" style="background:var(--blue-mid)"></div></div>
+    <div>
+      <div class="phase-card" onclick="tog(this)">
+        <div class="phase-top">
+          <div class="phase-name">內頁製作</div>
+          <div class="badges">
+            <span class="badge b-blue">設計師</span>
+            <span class="badge b-teal">可同步進行</span>
+          </div>
+        </div>
+        <div class="toggle-btn"><span class="arrow">↓</span> 展開細項</div>
+        <div class="phase-body">
+          <div class="sync-grid">
+            <div class="sync-card">
+              <div class="sync-label">編輯頁</div>
+              <div class="task-list">
+                <div class="task"><div class="task-mark"></div>上傳圖片 + 編輯器排版</div>
+                <div class="task"><div class="task-mark"></div>關於我們 / 品牌 / 服務介紹</div>
+              </div>
+              <div class="alert alert-ok" style="margin-top:8px">完成標準：圖片完成 + 排版完成</div>
+            </div>
+            <div class="sync-card">
+              <div class="sync-label">功能頁</div>
+              <div class="task-list">
+                <div class="task"><div class="task-mark"></div>後台建資料 + CSS 調整</div>
+                <div class="task"><div class="task-mark"></div>商品 / 最新消息 / 相簿 / 表單</div>
+              </div>
+              <div class="alert alert-ok" style="margin-top:8px">完成標準：CSS 完成 + 模組設定完成</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-line"></div>
+    <div class="phase-dot-wrap"><div class="phase-dot" style="background:var(--amber-mid)"></div></div>
+    <div>
+      <div class="phase-card warn-border" onclick="tog(this)">
+        <div class="phase-top">
+          <div class="phase-name">第二次審稿 — 內頁審稿</div>
+          <div class="badges">
+            <span class="badge b-blue">設計師</span>
+            <span class="badge b-amber">等客戶確認</span>
+          </div>
+        </div>
+        <div class="toggle-btn"><span class="arrow">↓</span> 展開細項</div>
+        <div class="phase-body">
+          <div class="task-list">
+            <div class="task"><div class="task-mark"></div>所有編輯頁完成</div>
+            <div class="task"><div class="task-mark"></div>所有功能頁 CSS + 模組完成</div>
+            <div class="task"><div class="task-mark"></div>內頁 Banner 完成</div>
+          </div>
+          <div class="alert alert-info">設計師完成 → 傳網址給規劃師 → 規劃師轉交客戶確認<br>客戶確認後，才送切版</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-dot-wrap"><div class="phase-dot" style="background:#888780"></div></div>
+    <div>
+      <div class="phase-card" onclick="tog(this)">
+        <div class="phase-top">
+          <div class="phase-name">送切版 → 結案</div>
+          <div class="badges">
+            <span class="badge b-blue">設計師</span>
+            <span class="badge b-teal">規劃師</span>
+            <span class="badge b-gray">工程師</span>
+          </div>
+        </div>
+        <div class="toggle-btn"><span class="arrow">↓</span> 展開細項</div>
+        <div class="phase-body">
+          <div class="task-list">
+            <div class="task"><div class="task-mark"></div><b>設計師</b> 填表單送切版申請</div>
+            <div class="task"><div class="task-mark"></div><b>工程師</b> 切版</div>
+            <div class="task"><div class="task-mark"></div><b>設計師</b> 視切版結果調整 custom.css</div>
+            <div class="task"><div class="task-mark"></div><b>規劃師</b> 提供關鍵字</div>
+            <div class="task"><div class="task-mark"></div><b>設計師</b> 關鍵字放上網站 → 結案</div>
+          </div>
+          <div class="alert alert-warn">網站更新後記得 Ctrl + F5 強制刷新確認</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="sec-divider"><span class="sec-tag">MONTHLY</span><div class="sec-line"></div></div>
+
+<div class="oq-wrap" style="margin-bottom:16px">
+  <div style="padding:14px 16px;border-bottom:1px solid var(--border-light)">
+    <div style="font-size:13px;font-weight:500;margin-bottom:10px">月底結算表</div>
+    <div class="task-list">
+      <div class="task"><div class="task-mark"></div>每月月底填寫，<b>最晚可於隔月 1 號</b>完成</div>
+      <div class="task"><div class="task-mark"></div><b>結算表</b> — 當月整體結算內容</div>
+      <div class="task"><div class="task-mark"></div><b>結算明細</b> — 須放入其他案件的製作進度</div>
+      <div class="task"><div class="task-mark"></div>若當月有協助開設 <b>Google 商家</b>，須另外記錄於結算表內</div>
+      <div class="task"><div class="task-mark"></div>若當月有製作 <b>LINE 選單</b>，須另外記錄於結算表內</div>
+    </div>
+    <div class="alert alert-warn" style="margin-top:8px">Google 商家開設、LINE 選單製作屬額外項目，不可漏填</div>
+  </div>
+  <div style="padding:14px 16px">
+    <div style="font-size:13px;font-weight:500;margin-bottom:10px">派工單收費說明</div>
+    <div class="task-list">
+      <div class="task"><div class="task-mark"></div>派工單性質：客戶要求修改，且修改內容<b>超過時間標準</b>的案件</div>
+      <div class="task"><div class="task-mark"></div>收費方式：直接<b>追加一頁</b>計算（非快速小改的那種）</div>
+      <div class="task"><div class="task-mark"></div>詳細計算方式請參考<b>結算表內的說明</b></div>
+    </div>
+    <div class="alert alert-info" style="margin-top:8px">快速可以改好的小修改 ≠ 派工單；派工單是有超過時間、需追加費用的修改</div>
+  </div>
+</div>
+
+<div class="sec-divider"><span class="sec-tag">TECHNICAL NOTES · 大圖校稿階段</span><div class="sec-line"></div></div>
+
+<div class="oq-wrap" style="margin-bottom:16px">
+
+  <!-- Q1 Header選單 -->
+  <div style="padding:14px 16px;border-bottom:1px solid var(--border-light)">
+    <div style="font-size:13px;font-weight:500;margin-bottom:6px">① Header 選單前台未顯示</div>
+    <div class="task-list">
+      <div class="task"><div class="task-mark"></div>後台查詢店家帳號 → 進入「<b>其他頁面</b>」選項</div>
+      <div class="task"><div class="task-mark"></div>新增首頁選單要開啟的欄位 → 前台即會顯示</div>
+    </div>
+    <div class="alert alert-warn" style="margin-top:8px">若後台相關欄位都已開啟但前台仍無顯示，需檢查「其他頁面」內是否有新增對應欄位</div>
+  </div>
+
+  <!-- Q2 Footer -->
+  <div style="padding:14px 16px;border-bottom:1px solid var(--border-light)">
+    <div style="font-size:13px;font-weight:500;margin-bottom:6px">② Footer 欄位修改 / 排列順序</div>
+    <div class="task-list">
+      <div class="task"><div class="task-mark"></div>Footer 內容由系統自動抓取後台資料，無須手動新增</div>
+      <div class="task"><div class="task-mark"></div>IG、FB 等社群連結<b>不放在 Footer</b>，統一處理在浮動按鈕</div>
+      <div class="task"><div class="task-mark"></div>LINE 若有名稱可放入 Footer（放之前先確認客戶 LINE 可正常查詢）</div>
+      <div class="task"><div class="task-mark"></div>需新增額外欄位 → 從後台的「<b>第二地址</b>」欄位新增內容；新增後前台項目標題會顯示為「地址」，需透過 CSS 修改名稱顯示</div>
+      <div class="task"><div class="task-mark"></div>CSS 改完名稱後，記得貼到 <b>custom.css</b> 內並上傳到後台</div>
+      <div class="task"><div class="task-mark"></div>調整排列順序：進 HTML 找到對應項目 → 在 CSS 內對該 <code>li</code> 設定 <code>display: flex</code> → 找到對應項目（如 <code>p</code>、<code>tel</code>）→ 設定 <code>order: 1</code>（數字越小越前面）→ <b>已設定的項目會排在未設定的項目前面</b></div>
+    </div>
+  </div>
+
+  <!-- Q3 浮動按鈕 -->
+  <div style="padding:14px 16px;border-bottom:1px solid var(--border-light)">
+    <div style="font-size:13px;font-weight:500;margin-bottom:6px">③ 修改浮動按鈕圖示與連結</div>
+    <div class="task-list">
+      <div class="task"><div class="task-mark"></div>從後台的「<b>浮動按鈕 Text</b>」欄位修改</div>
+      <div class="task"><div class="task-mark"></div>所有圖片（包含 Banner、浮動按鈕圖示）一律上傳至 <b>fz 站台</b></div>
+      <div class="task"><div class="task-mark"></div>程式碼從 fz 站台抓取檔案，<b>程式碼內的檔名必須與上傳的檔名完全一致</b>才能正確抓到</div>
+      <div class="task"><div class="task-mark"></div>若刪掉程式碼但前台仍有顯示 → 按 F12 開啟開發者工具，確認是哪條程式碼仍在作用，再刪除</div>
+    </div>
+  </div>
+
+  <!-- Q4 主機連線 -->
+  <div style="padding:14px 16px;border-bottom:1px solid var(--border-light)">
+    <div style="font-size:13px;font-weight:500;margin-bottom:6px">④ 主機連線方式 / 新增站台</div>
+    <div class="task-list">
+      <div class="task"><div class="task-mark"></div>主機選擇 <b>03</b> → 進入「全部設計師的站台」→ 以 <b>帳號</b> 搜尋找到自己的專案站台</div>
+      <div class="task"><div class="task-mark"></div>新開專案需自行新增站台：對「全站站台」按右鍵 → 新增 → 輸入帳號 → 完成建立</div>
+    </div>
+    <div class="alert alert-info" style="margin-top:8px">若在站台列表找不到專案，確認是否選到正確主機（03）以及帳號是否輸入正確</div>
+  </div>
+
+  <!-- Q5 內頁上傳 -->
+  <div style="padding:14px 16px">
+    <div style="font-size:13px;font-weight:500;margin-bottom:6px">⑤ 內頁 / 首頁上傳方式（含常見問題處理）</div>
+    <div class="task-list">
+      <div class="task"><div class="task-mark"></div>進入該案件後台的「<b>內頁區塊</b>」</div>
+      <div class="task"><div class="task-mark"></div>將新手包內的程式碼（檔案名稱：<b>平面校稿</b>）貼入編輯區塊</div>
+      <div class="task"><div class="task-mark"></div>將圖片名稱換成該欄位對應的正確圖片名稱</div>
+    </div>
+    <div style="margin-top:10px;font-size:12px;font-weight:500;color:var(--text-secondary)">▸ 狀況一：Banner 與首頁內容之間多出一塊白色區塊</div>
+    <div class="task-list" style="margin-top:6px">
+      <div class="task"><div class="task-mark"></div>按 F12 開啟開發者工具 → 選取該白色區塊</div>
+      <div class="task"><div class="task-mark"></div>在 CSS 加上 <code>display: none</code> 取消顯示即可</div>
+    </div>
+    <div class="alert alert-info" style="margin-top:6px">此為系統既有問題，原因不明，以 CSS 隱藏處理即可<br>完成後記得將 custom.css 的內容<b>複製到後台的 CSS 欄位內</b>，確保樣式正確套用</div>
+    <div style="margin-top:10px;font-size:12px;font-weight:500;color:var(--text-secondary)">▸ 狀況二：功能頁需穿插在編輯頁之間（較少見）</div>
+    <div class="task-list" style="margin-top:6px">
+      <div class="task"><div class="task-mark"></div>將程式碼區塊拆分為「功能頁前半段」與「功能頁後半段」分別儲存</div>
+      <div class="task"><div class="task-mark"></div>在該案件編輯器內上傳其中一個檔案</div>
+      <div class="task"><div class="task-mark"></div>在後台開啟「<b>自定義區塊</b>」，將另一個檔案放上去</div>
+      <div class="task"><div class="task-mark"></div>後台可移動區塊的顯示位置來調整順序</div>
+      <div class="task"><div class="task-mark"></div>若功能頁需顯示在首頁上 → 需開啟後台的「<b>在首頁顯示</b>」選項（未開啟則客戶修改後台資料後，內容不會同步更新到首頁）</div>
+    </div>
+    <div class="alert alert-warn" style="margin-top:6px">若版本不支援此做法（版本資訊僅供稿師/切版師可見）→ 先將功能頁放在最下面，<b>正式處理等到切版時請切版人員協助</b></div>
+    <div style="margin-top:10px;font-size:12px;font-weight:500;color:var(--text-secondary)">▸ 補充：內頁可直接修改 CSS</div>
+  </div>
+
+  <!-- Q6 內頁Banner -->
+  <div style="padding:14px 16px;border-bottom:1px solid var(--border-light)">
+    <div style="font-size:13px;font-weight:500;margin-bottom:6px">⑥ 內頁 Banner 製作與修改</div>
+    <div class="task-list">
+      <div class="task"><div class="task-mark"></div>內頁 Banner 換圖一律用 <b>custom.css</b> 修改，不動模組本身</div>
+      <div class="task"><div class="task-mark"></div>Menu 樣式為模組自帶，若需調整也要寫在 custom.css 內覆蓋</div>
+      <div class="task"><div class="task-mark"></div>Banner 製作時先裁好想要的尺寸與顯示樣式</div>
+    </div>
+    <div style="margin-top:10px;font-size:12px;font-weight:500;color:var(--text-secondary)">▸ 單一內頁 Banner 修改</div>
+    <div class="task-list" style="margin-top:6px">
+      <div class="task"><div class="task-mark"></div>用該頁面模組的專屬名稱（class）單獨撰寫，避免影響其他頁面</div>
+      <div class="task"><div class="task-mark"></div>範例：大自然蒸餾水產品頁 → <code>.banner.banF { ... }</code></div>
+      <div class="task"><div class="task-mark"></div>背景圖片連結格式：<code>https://主機網址/帳號/圖檔名稱.JPG</code>（可直接複製現有連結修改）</div>
+    </div>
+    <div style="margin-top:10px;font-size:12px;font-weight:500;color:var(--text-secondary)">▸ 跨內頁共用設定（如圖片大小）</div>
+    <div class="task-list" style="margin-top:6px">
+      <div class="task"><div class="task-mark"></div>直接寫在 <code>.banner</code> 父層內，可統一覆蓋所有子層的設定</div>
+    </div>
+    <div style="margin-top:10px;font-size:12px;font-weight:500;color:var(--text-secondary)">▸ 調整 Banner 大小</div>
+    <div class="task-list" style="margin-top:6px">
+      <div class="task"><div class="task-mark"></div>方法一：直接修改圖片尺寸</div>
+      <div class="task"><div class="task-mark"></div>方法二：調整文字的 <code>padding</code>（適合需要自由排版：置左／置中／置右，用方框內的 padding 推移）</div>
+    </div>
+    <div style="margin-top:10px;font-size:12px;font-weight:500;color:var(--text-secondary)">▸ 常用 CSS 範例</div>
+    <pre style="background:var(--bg-alt,#f5f5f3);border-radius:6px;padding:10px 12px;font-size:11px;margin-top:6px;overflow-x:auto">background-image: url(https://pic03.eapple.com.tw/048233289/banF.jpg);
+background-repeat: no-repeat;
+background-position: center center;</pre>
+    <div class="alert alert-warn" style="margin-top:8px">所有修改都要寫在 custom.css 內，否則重整後預設模組樣式會覆蓋設定<br>撰寫過程中若出現亂碼，貼回 VSCode 修改後再貼回即可</div>
+    <div class="alert alert-info" style="margin-top:6px">所有功能頁的 CSS 一律寫在 Header／Footer 區域</div>
+  </div>
+
+</div>
+
+<div class="sec-divider"><span class="sec-tag">OPEN QUESTIONS</span><div class="sec-line"></div></div>
+
+<div class="oq-wrap">
+  <div class="oq-row">
+    <div class="oq-n">1</div>
+    <div class="oq-q">首頁哪些區塊是圖片 vs 功能模組？每個案件的比例不同，需與規劃師確認</div>
+    <div class="oq-tag">首頁設計</div>
+  </div>
+  <div class="oq-row">
+    <div class="oq-n">2</div>
+    <div class="oq-q">「內頁完成」的正式定義為何？目前標準為圖片 + 排版 + CSS 完成</div>
+    <div class="oq-tag">審稿標準</div>
+  </div>
+  <div class="oq-row">
+    <div class="oq-n">3</div>
+    <div class="oq-q">是否需要動態效果？依案件規格，需提前確認避免低估工時</div>
+    <div class="oq-tag">CSS 複雜度</div>
+  </div>
+  <div class="oq-row">
+    <div class="oq-n">4</div>
+    <div class="oq-q">功能頁 CSS 統一寫在 custom.css？還是各頁面內單獨處理？</div>
+    <div class="oq-tag">CSS 管理</div>
+  </div>
+</div>
+
+<script>
+function tog(card){
+  const body=card.querySelector('.phase-body');
+  const btn=card.querySelector('.toggle-btn');
+  const open=body.classList.toggle('show');
+  btn.classList.toggle('open',open);
+  btn.childNodes[1].textContent=open?' 收合':' 展開細項';
+}
+</script>
+</body>
+</html>
