@@ -3753,32 +3753,13 @@ function buildFreshUserData() {
 }
 
 function loadUserData() {
-  try {
-    const raw = localStorage.getItem('cssquest_v1');
-    if (!raw) return buildFreshUserData();
-    const parsed = JSON.parse(raw);
-    parsed.completedLevels = new Set(parsed.completedLevels || []);
-    parsed.errors        = parsed.errors || {};
-    parsed.chapterStatus = parsed.chapterStatus || Object.assign({}, DEFAULT_CHAPTER_STATUS);
-    parsed.badges        = parsed.badges || [];
-    parsed.totalAttempts = parsed.totalAttempts || 0;
-    parsed.totalCorrect  = parsed.totalCorrect  || 0;
-    const today     = new Date().toDateString();
-    const yesterday = new Date(Date.now() - 86400000).toDateString();
-    if (parsed.sessionDate !== today) { parsed.sessionsToday = 0; parsed.sessionDate = today; }
-    if (parsed.lastPlayedDate && parsed.lastPlayedDate !== today && parsed.lastPlayedDate !== yesterday) {
-      parsed.streak = 0;
-    }
-    return parsed;
-  } catch(e) { return buildFreshUserData(); }
+  // Always start fresh — clear any saved data
+  localStorage.removeItem('cssquest_v1');
+  return buildFreshUserData();
 }
 
 function saveUserData() {
-  try {
-    const toSave = Object.assign({}, userData);
-    toSave.completedLevels = [...userData.completedLevels];
-    localStorage.setItem('cssquest_v1', JSON.stringify(toSave));
-  } catch(e) {}
+  // No-op — data is not persisted between sessions
 }
 
 function recordVisit() {
