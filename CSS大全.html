@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎨 Designer's CSS Cheat Sheet</title>
+  <style>
+    :root {
+      --bg-page: #F0EEE8;
+      --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Microsoft JhengHei", sans-serif;
+      --font-mono: "Fira Code", "Courier New", Courier, monospace;
+      --color-pink: #ED93B1;   --color-pink-dark: #72243E;   --color-pink-light: #FBEAF0;
+      --color-teal: #1D9E75;   --color-teal-dark: #085041;   --color-teal-light: #E1F5EE;
+      --color-purple: #7F77DD; --color-purple-dark: #3C3489; --color-purple-light: #EEEDFE;
+      --color-amber: #EF9F27;  --color-amber-dark: #633806;  --color-amber-light: #FAEEDA;
+      --color-coral: #D85A30;  --color-coral-dark: #4A1B0C;  --color-coral-light: #FAECE7;
+      --color-blue: #378ADD;   --color-blue-dark: #0C447C;   --color-blue-light: #E6F1FB;
+      --color-green: #639922;  --color-green-dark: #27500A;  --color-green-light: #EAF3DE;
+      --color-red: #E24B4A;    --color-red-dark: #501313;    --color-red-light: #FCEBEB;
+      --color-gray: #888780;   --color-gray-dark: #2C2C2A;   --color-gray-light: #F1EFE8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg-page); color: #33322E; font-family: var(--font-body); line-height: 1.6; padding: 40px 20px; }
+    .container { max-width: 960px; margin: 0 auto; }
+
+    .hero { background: white; border-radius: 16px; padding: 36px 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 28px; border: 1px solid #E2DFD5; }
+    .hero h1 { font-size: 2rem; color: #1E1E1C; margin-bottom: 6px; }
+    .hero p { color: #66645E; font-size: 1rem; margin-bottom: 24px; }
+
+    .search-wrap { position: relative; }
+    .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 1.1rem; pointer-events: none; opacity: 0.45; }
+    #searchInput { width: 100%; padding: 14px 50px 14px 46px; font-size: 1rem; font-family: var(--font-body); border: 2px solid #E2DFD5; border-radius: 10px; background: #FAFAF8; color: #33322E; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+    #searchInput:focus { border-color: var(--color-purple); box-shadow: 0 0 0 4px #EEEDFE; background: white; }
+    #clearBtn { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: #EEEDE9; border: none; border-radius: 50%; width: 26px; height: 26px; cursor: pointer; font-size: 0.85rem; color: #888780; display: none; align-items: center; justify-content: center; transition: background 0.15s; }
+    #clearBtn:hover { background: #E2DFD5; color: #33322E; }
+    #clearBtn.visible { display: flex; }
+
+    .quick-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .quick-tag { font-size: 0.78rem; font-weight: 600; padding: 4px 12px; border-radius: 20px; cursor: pointer; border: 1px solid transparent; transition: all 0.15s; user-select: none; }
+    .quick-tag:hover { opacity: 0.8; transform: translateY(-1px); }
+    .quick-tag.active { outline: 2px solid currentColor; outline-offset: 2px; }
+
+    .search-meta { display: flex; align-items: center; justify-content: space-between; margin: 18px 0 14px; min-height: 24px; }
+    .result-count { font-size: 0.85rem; color: #888780; }
+    .result-count strong { color: var(--color-purple-dark); }
+    .sort-wrap { display: flex; gap: 6px; }
+    .sort-btn { font-size: 0.78rem; font-weight: 600; padding: 3px 10px; border-radius: 6px; border: 1px solid #E2DFD5; background: white; cursor: pointer; color: #66645E; transition: all 0.15s; }
+    .sort-btn.active { background: var(--color-purple-light); color: var(--color-purple-dark); border-color: var(--color-purple); }
+
+    #results { display: flex; flex-direction: column; gap: 14px; }
+
+    .result-card { background: white; border: 1px solid #EAE8E1; border-radius: 12px; padding: 20px 22px; position: relative; overflow: hidden; transition: box-shadow 0.2s, transform 0.15s; }
+    .result-card::before { content: ""; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--card-accent, #888780); }
+    .result-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.08); transform: translateY(-1px); }
+
+    .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+    .card-section-badge { font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; white-space: nowrap; margin-top: 2px; flex-shrink: 0; }
+    .card-title { font-family: var(--font-mono); font-size: 1rem; font-weight: 700; color: #1E1E1C; margin-bottom: 4px; }
+    .card-title mark { background: #FFF3B0; color: #1E1E1C; border-radius: 2px; padding: 0 2px; }
+    .card-desc { font-size: 0.88rem; color: #5A5952; margin-bottom: 10px; }
+    .card-desc mark { background: #FFF3B0; color: #33322E; border-radius: 2px; padding: 0 2px; }
+
+    .warn-box { padding: 9px 12px; border-radius: 6px; font-size: 0.83rem; display: flex; gap: 6px; line-height: 1.4; margin-bottom: 10px; }
+    .warn-box.type-warn { background: #FFF9E6; border: 1px solid #FFEAA8; color: #7A5700; }
+    .warn-box.type-tip  { background: #EBF8FF; border: 1px solid #BEE3F8; color: #2B6CB0; }
+    .warn-box.type-rec  { background: #F0FDF4; border: 1px solid #BBF7D0; color: #166534; }
+
+    .code-preview { background: #EEEDE9; border: 1px solid #E2DFD5; border-radius: 6px; padding: 10px 12px; font-family: var(--font-mono); font-size: 0.82rem; color: #33322E; white-space: pre; overflow-x: auto; position: relative; cursor: pointer; }
+    .code-preview mark { background: #FFE680; color: #33322E; border-radius: 2px; }
+    .copy-hint { position: absolute; right: 8px; top: 6px; font-size: 0.7rem; color: #888780; opacity: 0; transition: opacity 0.2s; font-family: var(--font-body); pointer-events: none; }
+    .code-preview:hover .copy-hint { opacity: 1; }
+    .copy-hint.copied { color: var(--color-teal-dark); opacity: 1 !important; }
+
+    .card-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
+    .card-tag { font-size: 0.72rem; font-weight: 600; padding: 2px 7px; border-radius: 4px; background: #EBEAE4; color: #5A5952; }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: #888780; }
+    .empty-state .emoji { font-size: 3rem; margin-bottom: 12px; }
+    .empty-state p { font-size: 0.95rem; }
+    .empty-state span { color: var(--color-purple); font-weight: 600; }
+
+    #toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px); background: #2C2C2A; color: white; padding: 10px 20px; border-radius: 8px; font-size: 0.88rem; opacity: 0; pointer-events: none; transition: opacity 0.25s, transform 0.25s; z-index: 1000; }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .kbd { display: inline-block; background: #EEEDE9; border: 1px solid #D5D3CC; border-radius: 4px; padding: 1px 6px; font-family: var(--font-mono); font-size: 0.75rem; color: #66645E; }
+
+    @media print {
+      body { background: white; padding: 0; }
+      .hero, .result-card { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
+      .quick-tags, .search-meta, #searchInput, #clearBtn { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <header class="hero">
+    <h1>🎨 Designer's CSS Cheat Sheet</h1>
+    <p>專為 UI/UX 設計師打造的網頁排版與樣式指南。用中文描述問題也能找到答案。按 <span class="kbd">/</span> 快速聚焦搜尋框。</p>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="例如：按鈕間距太擠、圖片變形、文字超出範圍、卡片等高…" autocomplete="off" spellcheck="false">
+      <button id="clearBtn" title="清除">✕</button>
+    </div>
+    <div class="quick-tags" id="quickTags">
+      <span class="quick-tag" style="background:var(--color-pink-light);color:var(--color-pink-dark)"     data-query="卡片">🃏 卡片</span>
+      <span class="quick-tag" style="background:var(--color-purple-light);color:var(--color-purple-dark)" data-query="按鈕">🔘 按鈕</span>
+      <span class="quick-tag" style="background:var(--color-teal-light);color:var(--color-teal-dark)"     data-query="間距">📐 間距</span>
+      <span class="quick-tag" style="background:var(--color-amber-light);color:var(--color-amber-dark)"   data-query="文字">🔤 文字</span>
+      <span class="quick-tag" style="background:var(--color-coral-light);color:var(--color-coral-dark)"   data-query="flex">🧱 Flex</span>
+      <span class="quick-tag" style="background:var(--color-blue-light);color:var(--color-blue-dark)"     data-query="圖片">🖼 圖片</span>
+      <span class="quick-tag" style="background:var(--color-pink-light);color:var(--color-pink-dark)"     data-query="hover">✨ Hover</span>
+      <span class="quick-tag" style="background:var(--color-green-light);color:var(--color-green-dark)"   data-query="容器">📦 容器</span>
+      <span class="quick-tag" style="background:var(--color-gray-light);color:var(--color-gray-dark)"     data-query="grid">🧩 Grid</span>
+      <span class="quick-tag" style="background:var(--color-purple-light);color:var(--color-purple-dark)" data-query="animation">🎬 動畫</span>
+      <span class="quick-tag" style="background:var(--color-gray-light);color:var(--color-gray-dark)"     data-query="shadow">🌑 陰影</span>
+      <span class="quick-tag" style="background:var(--color-blue-light);color:var(--color-blue-dark)"     data-query="responsive">📱 響應式</span>
+      <span class="quick-tag" style="background:var(--color-red-light);color:var(--color-red-dark)"       data-query="devtools">🔧 除錯</span>
+    </div>
+  </header>
+
+  <div class="search-meta">
+    <div class="result-count" id="resultCount"></div>
+    <div class="sort-wrap">
+      <button class="sort-btn active" id="sortRelevance" onclick="setSort('relevance')">相關度</button>
+      <button class="sort-btn" id="sortCategory" onclick="setSort('category')">分類</button>
+    </div>
+  </div>
+  <div id="results"></div>
+</div>
+<div id="toast">✅ 已複製到剪貼簿</div>
+
+<script>
+const DATA = [
+  // 🃏 卡片設計
+  { id:1,  section:"🃏 卡片設計", accent:"#ED93B1", badgeBg:"#FBEAF0", badgeColor:"#72243E",
+    title:"border-radius & overflow",
+    desc:"卡片頂部有滿版圖片時，必須加 overflow: hidden，否則圖片直角會刺穿圓角。對應 Figma 的 Clip Content。",
+    code:".card {\n  border-radius: 16px;\n  overflow: hidden; /* 圖片不刺穿圓角的關鍵 */\n}",
+    warn:{type:"tip", text:"💡 Figma 對應：Frame → Clip Content 打勾"},
+    tags:["border-radius","overflow","Figma: Clip Content"],
+    keys:["圓角","裁切","overflow","radius","卡片","card","clip"] },
+
+  { id:2,  section:"🃏 卡片設計", accent:"#ED93B1", badgeBg:"#FBEAF0", badgeColor:"#72243E",
+    title:"box-shadow（卡片陰影）",
+    desc:"多層陰影疊加比單層更自然，模擬真實光線。第一層大範圍擴散，第二層緊貼輪廓加深。",
+    code:"/* 輕量浮起感 */\nbox-shadow: 0 2px 8px rgba(0,0,0,0.08),\n            0 1px 2px rgba(0,0,0,0.04);\n\n/* 明顯懸浮感 */\nbox-shadow: 0 8px 32px rgba(0,0,0,0.12),\n            0 2px 8px rgba(0,0,0,0.06);\n\n/* 色彩陰影（品牌感） */\nbox-shadow: 0 8px 24px rgba(127,119,221,0.3);",
+    tags:["box-shadow","shadow","elevation"],
+    keys:["陰影","shadow","elevation","box-shadow","浮起","卡片","立體"] },
+
+  { id:3,  section:"🃏 卡片設計", accent:"#ED93B1", badgeBg:"#FBEAF0", badgeColor:"#72243E",
+    title:"aspect-ratio（固定圖片比例）",
+    desc:"強制圖片容器維持固定比例，不論原始尺寸為何都能整齊排列，是卡片列表的必備屬性。",
+    code:".card-img {\n  aspect-ratio: 16 / 9; /* 也可以用 4/3、1/1、3/2 */\n  overflow: hidden;\n}\n.card-img img {\n  width: 100%;\n  height: 100%;\n  object-fit: cover;\n}",
+    tags:["aspect-ratio","object-fit","圖片比例"],
+    keys:["比例","aspect","圖片","object-fit","裁切","16:9","正方形","卡片"] },
+
+  { id:4,  section:"🃏 卡片設計", accent:"#ED93B1", badgeBg:"#FBEAF0", badgeColor:"#72243E",
+    title:"卡片 Hover 升起效果",
+    desc:"懸停時上移並加深陰影，給使用者明確的可點擊回饋。transition 讓動作流暢。",
+    code:".card {\n  transition: transform 0.2s ease, box-shadow 0.2s ease;\n  cursor: pointer;\n}\n.card:hover {\n  transform: translateY(-4px);\n  box-shadow: 0 12px 40px rgba(0,0,0,0.14);\n}",
+    tags:["hover","transition","transform","升起"],
+    keys:["hover","升起","動畫","transition","卡片","互動","懸停"] },
+
+  { id:5,  section:"🃏 卡片設計", accent:"#ED93B1", badgeBg:"#FBEAF0", badgeColor:"#72243E",
+    title:"卡片等高 + 按鈕對齊底部",
+    desc:"用 Flex column 讓卡片縱向排列，margin-top: auto 將按鈕推到底部，不論內容多寡都對齊。",
+    code:".card {\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n}\n.card-footer {\n  margin-top: auto; /* 按鈕永遠釘在底部 */\n  padding-top: 16px;\n}",
+    warn:{type:"rec", text:"✅ 卡片列表黃金公式：父層用 Grid/Flex stretch，卡片用 flex column + margin-top auto"},
+    tags:["flex","margin-top:auto","等高卡片"],
+    keys:["卡片","flex","column","縱向","按鈕對齊","底部","等高","stretch"] },
+
+  // 🔘 按鈕設計
+  { id:10, section:"🔘 按鈕設計", accent:"#7F77DD", badgeBg:"#EEEDFE", badgeColor:"#3C3489",
+    title:"按鈕基礎重置",
+    desc:"移除瀏覽器預設樣式，建立一致的按鈕起始點。幾乎每個專案都要用到，其他樣式疊加在這之上。",
+    code:".btn {\n  appearance: none;\n  border: none;\n  font-family: inherit; /* 繼承頁面字型 */\n  font-weight: 600;\n  font-size: 14px;\n  padding: 10px 20px;\n  border-radius: 6px;\n  cursor: pointer;\n  display: inline-flex;\n  align-items: center;\n  gap: 8px;\n  transition: all 0.2s;\n  text-decoration: none;\n  white-space: nowrap;\n}",
+    warn:{type:"warn", text:"⚠️ 記得加 font-family: inherit，否則按鈕字型會和頁面不一樣"},
+    tags:["appearance","reset","按鈕基礎"],
+    keys:["按鈕","button","reset","appearance","基礎","重置","font-family"] },
+
+  { id:11, section:"🔘 按鈕設計", accent:"#7F77DD", badgeBg:"#EEEDFE", badgeColor:"#3C3489",
+    title:"Solid / Outline / Ghost 三種變體",
+    desc:"對應不同視覺權重：主要操作用 Solid、次要用 Outline、再次要用 Ghost。同頁面最多同時出現兩種。",
+    code:"/* Solid — 最重，主要 CTA */\n.btn-solid { background: #7F77DD; color: white; }\n.btn-solid:hover { background: #3C3489; }\n\n/* Outline — 次要操作 */\n.btn-outline {\n  background: transparent;\n  border: 2px solid #7F77DD;\n  color: #7F77DD;\n}\n.btn-outline:hover { background: #EEEDFE; }\n\n/* Ghost — 最輕，輔助操作 */\n.btn-ghost { background: transparent; color: #7F77DD; }\n.btn-ghost:hover { background: #EEEDFE; }",
+    tags:["solid","outline","ghost","按鈕變體"],
+    keys:["按鈕","solid","outline","ghost","樣式","variant","primary","secondary"] },
+
+  { id:12, section:"🔘 按鈕設計", accent:"#7F77DD", badgeBg:"#EEEDFE", badgeColor:"#3C3489",
+    title:"按鈕尺寸（sm / md / lg）",
+    desc:"透過 padding 和 font-size 控制大小，不要直接設定 width/height，讓內容決定寬度。",
+    code:".btn-sm { padding: 6px 14px;  font-size: 12px; border-radius: 4px; }\n.btn-md { padding: 10px 20px; font-size: 14px; border-radius: 6px; } /* 預設 */\n.btn-lg { padding: 14px 28px; font-size: 16px; border-radius: 8px; }\n\n/* 全寬按鈕（常用在手機版） */\n.btn-full { width: 100%; justify-content: center; }",
+    tags:["btn-sm","btn-lg","按鈕尺寸"],
+    keys:["按鈕","大小","尺寸","sm","lg","size","全寬","mobile"] },
+
+  { id:13, section:"🔘 按鈕設計", accent:"#7F77DD", badgeBg:"#EEEDFE", badgeColor:"#3C3489",
+    title:"Pill 膠囊 & 圓形圖示按鈕",
+    desc:"border-radius 設極大值讓按鈕變膠囊形。圓形圖示按鈕需固定寬高並設 border-radius: 50%。",
+    code:"/* 膠囊形 */\n.btn-pill { border-radius: 99px; }\n\n/* 圓形圖示按鈕 */\n.btn-icon {\n  width: 40px;\n  height: 40px;\n  padding: 0;\n  border-radius: 50%;\n  justify-content: center;\n}",
+    tags:["pill","border-radius","圓形","圖示按鈕"],
+    keys:["膠囊","pill","圓角","border-radius","圓形","icon button","按鈕"] },
+
+  { id:14, section:"🔘 按鈕設計", accent:"#7F77DD", badgeBg:"#EEEDFE", badgeColor:"#3C3489",
+    title:"Loading spinner 狀態",
+    desc:"按鈕點擊後顯示 Loading，用純 CSS animation 做旋轉圈圈，不需要圖片或 JS 函式庫。",
+    code:"@keyframes spin {\n  to { transform: rotate(360deg); }\n}\n.spinner {\n  width: 14px; height: 14px;\n  border: 2px solid rgba(255,255,255,0.35);\n  border-top-color: white;\n  border-radius: 50%;\n  animation: spin 0.8s linear infinite;\n  flex-shrink: 0;\n}",
+    warn:{type:"tip", text:"💡 Outline 按鈕的 spinner 顏色要改成主題色，不是 white"},
+    tags:["loading","spinner","animation","disabled"],
+    keys:["loading","spinner","動畫","旋轉","animation","keyframe","按鈕","disabled"] },
+
+  { id:15, section:"🔘 按鈕設計", accent:"#7F77DD", badgeBg:"#EEEDFE", badgeColor:"#3C3489",
+    title:"按鈕間距設定（padding & gap）",
+    desc:"按鈕本身用 padding 控制內部空間，按鈕群組用 gap 控制彼此距離，不要用 margin 推按鈕。",
+    code:"/* ✅ 按鈕群組 — 用 gap */\n.btn-group {\n  display: flex;\n  align-items: center;\n  gap: 8px;        /* 按鈕之間的距離 */\n  flex-wrap: wrap; /* 手機版自動換行 */\n}\n\n/* ✅ 按鈕內距 — 用 padding */\n.btn { padding: 10px 20px; }\n\n/* ❌ 不建議 */\n/* .btn { margin-right: 8px; } */",
+    warn:{type:"rec", text:"✅ 黃金比例：padding 上下 = 左右的一半。例如 padding: 10px 20px"},
+    tags:["padding","gap","按鈕間距","btn-group"],
+    keys:["按鈕","間距","padding","gap","太擠","群組","排列","btn-group","button spacing","內距","空間"] },
+
+  { id:16, section:"🔘 按鈕設計", accent:"#7F77DD", badgeBg:"#EEEDFE", badgeColor:"#3C3489",
+    title:"Danger / Success 語意按鈕",
+    desc:"刪除、警告等危險操作用紅色，成功確認用綠色。顏色傳達語意，讓使用者在操作前有正確預期。",
+    code:".btn-danger  { background: #E24B4A; color: white; }\n.btn-danger:hover  { background: #501313; }\n\n.btn-success { background: #1D9E75; color: white; }\n.btn-success:hover { background: #085041; }\n\n.btn-warning { background: #EF9F27; color: white; }\n.btn-warning:hover { background: #633806; }",
+    tags:["danger","success","warning","語意顏色"],
+    keys:["危險","刪除","danger","success","warning","顏色","語意","按鈕","紅色","綠色"] },
+
+  // 📐 間距控制
+  { id:20, section:"📐 間距控制", accent:"#1D9E75", badgeBg:"#E1F5EE", badgeColor:"#085041",
+    title:"padding vs margin 根本差異",
+    desc:"padding 是往內撐開（背景色會填入），margin 是往外推開（背景色不填入）。Flexbox 中盡量用 gap 代替 margin。",
+    code:"/* padding：背景色填滿，影響點擊範圍 */\n.btn { padding: 10px 20px; }\n\n/* margin：推開外部元素，背景不填入 */\n.section { margin-bottom: 40px; }\n\n/* 常用縮寫順序（順時針）*/\npadding: 16px;               /* 四邊相同 */\npadding: 12px 24px;          /* 上下 左右 */\npadding: 8px 16px 12px 20px; /* 上 右 下 左 */",
+    warn:{type:"tip", text:"💡 Figma：padding = Inner Padding，margin = 元素間距"},
+    tags:["padding","margin","間距"],
+    keys:["間距","padding","margin","space","figma","內距","外距","背景","差異"] },
+
+  { id:21, section:"📐 間距控制", accent:"#1D9E75", badgeBg:"#E1F5EE", badgeColor:"#085041",
+    title:"gap（Flex / Grid 子元素間距）",
+    desc:"在 Flex 或 Grid 容器上設定 gap，比 margin 更語意清晰，也不會有邊緣多餘間距的問題。",
+    code:".flex-row {\n  display: flex;\n  gap: 16px; /* 所有方向 */\n}\n\n/* 分開設定 */\n.grid {\n  display: grid;\n  row-gap: 24px;    /* 列間距 */\n  column-gap: 16px; /* 欄間距 */\n  /* 縮寫：gap: 24px 16px */\n}",
+    warn:{type:"rec", text:"✅ Figma Auto Layout 的 Gap Between Items 就是 gap"},
+    tags:["gap","row-gap","column-gap","flex","grid"],
+    keys:["gap","間距","flex","grid","spacing","自動佈局","row-gap","column-gap","太擠"] },
+
+  { id:22, section:"📐 間距控制", accent:"#1D9E75", badgeBg:"#E1F5EE", badgeColor:"#085041",
+    title:"spacing scale（間距系統）",
+    desc:"設計系統中間距用 4 或 8 的倍數，讓整體視覺更有節奏感。用 CSS 變數定義後全站統一使用。",
+    code:":root {\n  --space-1:  4px;\n  --space-2:  8px;\n  --space-3: 12px;\n  --space-4: 16px;\n  --space-5: 24px;\n  --space-6: 32px;\n  --space-7: 48px;\n  --space-8: 64px;\n}\n\n.card    { padding: var(--space-5); }\n.section { margin-bottom: var(--space-8); }",
+    warn:{type:"tip", text:"💡 4px 格線對應 Figma 8pt Grid，讓設計稿與實作完美對齊"},
+    tags:["spacing scale","CSS變數","設計系統"],
+    keys:["間距","spacing","scale","設計系統","4px","8px","變數","token","節奏"] },
+
+  { id:23, section:"📐 間距控制", accent:"#1D9E75", badgeBg:"#E1F5EE", badgeColor:"#085041",
+    title:"margin: 0 auto（容器水平置中）",
+    desc:"設定 max-width 後用 margin: 0 auto 讓容器水平置中，是所有頁面布局的核心結構。",
+    code:".container {\n  max-width: 1200px;\n  margin: 0 auto;\n  padding: 0 20px; /* 手機側邊留白 */\n}\n\n/* 窄版閱讀區（文章、表單）*/\n.content {\n  max-width: 680px;\n  margin: 0 auto;\n}",
+    tags:["margin:auto","max-width","container","置中"],
+    keys:["置中","container","max-width","margin auto","水平","頁面寬度","居中"] },
+
+  // 🔤 文字設定
+  { id:30, section:"🔤 文字設定", accent:"#EF9F27", badgeBg:"#FAEEDA", badgeColor:"#633806",
+    title:"font-family（字型堆疊）",
+    desc:"系統字型依序嘗試，最後一定要放 sans-serif 保底。Microsoft JhengHei 是微軟正黑體（繁體中文 Windows）。",
+    code:"font-family:\n  -apple-system,        /* macOS/iOS SF Pro */\n  BlinkMacSystemFont,   /* Chrome on macOS */\n  \"Segoe UI\",           /* Windows */\n  Roboto,               /* Android */\n  \"Helvetica Neue\", Arial,\n  \"Microsoft JhengHei\", /* 繁中 Windows */\n  \"PingFang TC\",        /* 繁中 macOS */\n  sans-serif;",
+    tags:["font-family","字型堆疊","中文字型"],
+    keys:["字型","font","中文","font-family","系統字型","helvetica","PingFang","正黑體"] },
+
+  { id:31, section:"🔤 文字設定", accent:"#EF9F27", badgeBg:"#FAEEDA", badgeColor:"#633806",
+    title:"font-size & rem 單位",
+    desc:"rem 相對於根元素（html），em 相對於父元素。推薦用 rem 做字體大小，避免 em 嵌套計算問題。",
+    code:"html { font-size: 16px; } /* 瀏覽器預設 */\n\n/* 常用尺寸對照 */\n/* 12px = 0.75rem  ← caption */\n/* 14px = 0.875rem ← 次要文字 */\n/* 16px = 1rem     ← 內文基準 */\n/* 18px = 1.125rem */\n/* 24px = 1.5rem   ← 小標題 */\n/* 32px = 2rem     ← 大標題 */\n\n.body-text { font-size: 1rem; }\n.caption   { font-size: 0.875rem; }\n.h2        { font-size: 1.5rem; }",
+    warn:{type:"warn", text:"⚠️ 避免用 px 設定字體，會讓使用者的瀏覽器無障礙字型設定失效"},
+    tags:["font-size","rem","em","單位"],
+    keys:["字體大小","font-size","rem","em","px","單位","字型","大小"] },
+
+  { id:32, section:"🔤 文字設定", accent:"#EF9F27", badgeBg:"#FAEEDA", badgeColor:"#633806",
+    title:"line-height（行高）",
+    desc:"行高用無單位數值（倍數），標題偏緊（1.2–1.3），內文偏鬆（1.5–1.7）。中文建議比英文再加 0.1–0.2。",
+    code:"h1, h2, h3 { line-height: 1.25; } /* 標題緊一點 */\np, li      { line-height: 1.6;  } /* 內文鬆一點 */\n.btn       { line-height: 1;    } /* 按鈕不要行高 */\n\n/* 中文推薦 */\n.zh-body { line-height: 1.75; }\n\n/* 垂直置中技巧（固定高度容器）*/\n.badge { height: 24px; line-height: 24px; padding: 0 8px; }",
+    tags:["line-height","行高","中文"],
+    keys:["行高","line-height","文字","標題","內文","中文","閱讀","間距"] },
+
+  { id:33, section:"🔤 文字設定", accent:"#EF9F27", badgeBg:"#FAEEDA", badgeColor:"#633806",
+    title:"文字截斷 ellipsis（單行 & 多行）",
+    desc:"超出範圍的文字顯示省略號。單行要三個屬性同時設定，缺一不可。多行截斷用 -webkit-line-clamp。",
+    code:"/* 單行截斷 — 三個缺一不可 */\n.truncate {\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  max-width: 200px; /* 必須有寬度限制 */\n}\n\n/* 多行截斷（顯示 2 行）*/\n.clamp-2 {\n  display: -webkit-box;\n  -webkit-line-clamp: 2;\n  -webkit-box-orient: vertical;\n  overflow: hidden;\n}",
+    warn:{type:"warn", text:"⚠️ 截斷元素必須有明確寬度（width 或 max-width），否則不生效"},
+    tags:["ellipsis","text-overflow","line-clamp","截斷"],
+    keys:["截斷","ellipsis","文字","省略","text-overflow","clamp","多行","超出","overflow"] },
+
+  { id:34, section:"🔤 文字設定", accent:"#EF9F27", badgeBg:"#FAEEDA", badgeColor:"#633806",
+    title:"font-weight & letter-spacing",
+    desc:"font-weight 決定字體粗細，letter-spacing 調整字距。中文標題加微小正值字距，英文全大寫標籤加 0.05–0.1em。",
+    code:"/* font-weight 常用值 */\n.light    { font-weight: 300; }\n.regular  { font-weight: 400; }\n.medium   { font-weight: 500; }\n.semibold { font-weight: 600; }\n.bold     { font-weight: 700; }\n\n/* 中文標題字距 */\n.zh-heading { letter-spacing: 0.05em; }\n\n/* 英文全大寫 label */\n.label {\n  text-transform: uppercase;\n  letter-spacing: 0.08em;\n  font-size: 0.75rem;\n  font-weight: 700;\n}",
+    tags:["font-weight","letter-spacing","uppercase"],
+    keys:["字重","粗細","font-weight","letter-spacing","字距","bold","uppercase","label","字型"] },
+
+  { id:35, section:"🔤 文字設定", accent:"#EF9F27", badgeBg:"#FAEEDA", badgeColor:"#633806",
+    title:"文字顏色層次",
+    desc:"不要用純黑 #000000，改用帶色調的深色。透過顏色透明度建立主次層次，比單純改字體大小更精緻。",
+    code:":root {\n  --text-primary:   #1E1E1C; /* 標題主文 */\n  --text-secondary: #4A4943; /* 副文說明 */\n  --text-tertiary:  #888780; /* 輔助標註 */\n  --text-disabled:  #C5C3BC; /* 禁用狀態 */\n}\n\n/* 或用 opacity 疊加 */\n.caption { color: rgba(51,50,46,0.55); }",
+    warn:{type:"tip", text:"💡 Figma：文字顏色層次 = 同一顏色 Fill Opacity 不同"},
+    tags:["color","opacity","文字層次"],
+    keys:["顏色","color","opacity","文字","層次","主次","disabled","secondary","純黑"] },
+
+  // 🧱 Flex 排版
+  { id:40, section:"🧱 Flex 排版", accent:"#D85A30", badgeBg:"#FAECE7", badgeColor:"#4A1B0C",
+    title:"Flex 基礎置中",
+    desc:"最快速將子元素水平 + 垂直同時置中。是所有置中需求的首選解法。",
+    code:".center {\n  display: flex;\n  align-items: center;     /* 垂直置中 */\n  justify-content: center; /* 水平置中 */\n}\n\n/* Modal 背景全版置中 */\n.overlay {\n  position: fixed; inset: 0;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}",
+    tags:["flex","置中","center","align-items"],
+    keys:["flex","置中","center","align","justify","排版","垂直置中","水平置中","modal"] },
+
+  { id:41, section:"🧱 Flex 排版", accent:"#D85A30", badgeBg:"#FAECE7", badgeColor:"#4A1B0C",
+    title:"justify-content 主軸對齊",
+    desc:"控制主軸（預設水平）上的排列方式。space-between 是最常用的：兩端對齊，中間均勻分配。",
+    code:"justify-content: flex-start;    /* 靠左（預設）*/\njustify-content: flex-end;      /* 靠右 */\njustify-content: center;        /* 置中 */\njustify-content: space-between; /* 兩端對齊 ★最常用★ */\njustify-content: space-around;  /* 每個元素兩側等距 */\njustify-content: space-evenly;  /* 所有間距完全相等 */",
+    tags:["justify-content","space-between","flex"],
+    keys:["justify","flex","對齊","space-between","排版","水平","主軸","靠右","靠左"] },
+
+  { id:42, section:"🧱 Flex 排版", accent:"#D85A30", badgeBg:"#FAECE7", badgeColor:"#4A1B0C",
+    title:"align-items 交叉軸對齊",
+    desc:"控制交叉軸（預設垂直）的對齊方式。stretch 是預設值，讓子元素拉伸到容器高度，這是等高列的原理。",
+    code:"align-items: stretch;    /* 拉伸至容器高度（預設）*/\nalign-items: center;     /* 垂直置中 ★最常用★ */\nalign-items: flex-start; /* 靠上 */\nalign-items: flex-end;   /* 靠下 */\nalign-items: baseline;   /* 文字基線對齊 */",
+    tags:["align-items","stretch","baseline","flex"],
+    keys:["align-items","flex","垂直","置中","對齊","stretch","baseline","交叉軸","等高"] },
+
+  { id:43, section:"🧱 Flex 排版", accent:"#D85A30", badgeBg:"#FAECE7", badgeColor:"#4A1B0C",
+    title:"flex-wrap（自動換行）",
+    desc:"預設 Flex 子元素不換行（會壓縮）。設定 wrap 後超出容器寬度自動換行，常用於 tag 列表、卡片群組。",
+    code:".tag-list {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 8px;\n}\n\n/* 三欄卡片，小螢幕自動換行 */\n.card-row {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 20px;\n}\n.card-row > * {\n  flex: 0 0 calc(33.33% - 14px);\n}",
+    tags:["flex-wrap","換行","wrap"],
+    keys:["wrap","換行","flex","tag","排版","自動","多行","超出","card"] },
+
+  { id:44, section:"🧱 Flex 排版", accent:"#D85A30", badgeBg:"#FAECE7", badgeColor:"#4A1B0C",
+    title:"flex: 1（填滿剩餘空間）",
+    desc:"讓子元素填滿容器剩餘空間。sidebar + content 布局的核心，content 設 flex:1 自動佔滿。",
+    code:".layout {\n  display: flex;\n  height: 100vh;\n}\n.sidebar {\n  width: 240px;\n  flex-shrink: 0; /* 不讓 sidebar 被壓縮 */\n}\n.main {\n  flex: 1; /* 填滿剩餘空間 */\n  overflow: auto;\n}",
+    tags:["flex:1","flex-grow","flex-shrink","sidebar"],
+    keys:["flex","填滿","flex:1","grow","sidebar","layout","排版","剩餘空間","shrink"] },
+
+  { id:45, section:"🧱 Flex 排版", accent:"#D85A30", badgeBg:"#FAECE7", badgeColor:"#4A1B0C",
+    title:"flex-direction（排列方向）",
+    desc:"預設是 row（水平）。設定 column 變縱向排列，對應 Figma Auto Layout 的 Vertical。",
+    code:".row    { flex-direction: row; }    /* 水平（預設）*/\n.column { flex-direction: column; } /* 縱向 */\n\n/* 縱向排列 + 置中 */\n.card-body {\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  gap: 12px;\n}",
+    tags:["flex-direction","column","row"],
+    keys:["flex-direction","column","row","縱向","水平","方向","排列","figma auto layout","vertical"] },
+
+  // 🖼 圖片控制
+  { id:50, section:"🖼 圖片控制", accent:"#378ADD", badgeBg:"#E6F1FB", badgeColor:"#0C447C",
+    title:"object-fit（圖片裁切模式）",
+    desc:"設定圖片在固定容器內的顯示方式。cover 填滿並裁切（最常用），contain 縮放不裁切，fill 拉伸變形（避免）。",
+    code:"img {\n  width: 100%;\n  height: 200px;\n  object-fit: cover;           /* 填滿裁切 ✅ */\n  /* object-fit: contain;       縮放不裁切 */\n  /* object-fit: fill;          拉伸 ❌ 變形 */\n  object-position: center top; /* 裁切基準點 */\n}",
+    warn:{type:"warn", text:"⚠️ 圖片變形？檢查是否缺少 object-fit: cover"},
+    tags:["object-fit","cover","contain","object-position"],
+    keys:["圖片","object-fit","cover","contain","裁切","縮放","變形","拉伸","比例"] },
+
+  { id:51, section:"🖼 圖片控制", accent:"#378ADD", badgeBg:"#E6F1FB", badgeColor:"#0C447C",
+    title:"圖片響應式（不超出容器）",
+    desc:"max-width: 100% 讓圖片在小螢幕自動縮小，display: block 消除圖片底部神秘空白。",
+    code:"/* 全域設定，建議加在 CSS reset */\nimg {\n  max-width: 100%;\n  height: auto;    /* 維持原始比例 */\n  display: block;  /* 消除底部神秘空白 */\n}",
+    warn:{type:"tip", text:"💡 display: block 解決圖片底部 3–4px 神秘空白問題"},
+    tags:["max-width","height:auto","responsive","display:block"],
+    keys:["圖片","響應式","max-width","縮放","比例","空白","display block","神秘"] },
+
+  { id:52, section:"🖼 圖片控制", accent:"#378ADD", badgeBg:"#E6F1FB", badgeColor:"#0C447C",
+    title:"filter（圖片濾鏡）",
+    desc:"純 CSS 對圖片做亮度、對比、模糊、灰階等效果，常用於 hover 漸暗或黑白效果。",
+    code:"/* Hover 漸暗 */\n.card-img img { transition: filter 0.3s; }\n.card-img:hover img { filter: brightness(0.75); }\n\n/* 常用濾鏡 */\nfilter: brightness(0.8);              /* 變暗 */\nfilter: grayscale(100%);              /* 黑白 */\nfilter: blur(4px);                    /* 模糊 */\nfilter: brightness(1.1) saturate(1.2);/* 鮮豔化 */",
+    tags:["filter","brightness","grayscale","blur"],
+    keys:["濾鏡","filter","圖片","模糊","blur","亮度","brightness","黑白","grayscale","hover"] },
+
+  { id:53, section:"🖼 圖片控制", accent:"#378ADD", badgeBg:"#E6F1FB", badgeColor:"#0C447C",
+    title:"backdrop-filter（毛玻璃效果）",
+    desc:"讓元素背後的內容模糊，製造 Frosted Glass 毛玻璃質感，是現代 UI 常見的視覺效果。",
+    code:".glass-card {\n  background: rgba(255, 255, 255, 0.2);\n  backdrop-filter: blur(12px);\n  -webkit-backdrop-filter: blur(12px); /* Safari */\n  border: 1px solid rgba(255, 255, 255, 0.3);\n  border-radius: 16px;\n}",
+    warn:{type:"warn", text:"⚠️ 父層不能有 overflow: hidden，否則 backdrop-filter 失效"},
+    tags:["backdrop-filter","blur","毛玻璃","glass"],
+    keys:["毛玻璃","glass","backdrop-filter","blur","模糊","透明","frosted","質感"] },
+
+  // ✨ Hover 效果
+  { id:60, section:"✨ Hover 效果", accent:"#ED93B1", badgeBg:"#FBEAF0", badgeColor:"#72243E",
+    title:"transition（過渡動畫）",
+    desc:"讓屬性變化平滑過渡。指定屬性比 all 效能更好。ease-out 適合退出，ease-in-out 適合一般互動。",
+    code:"/* 指定屬性（推薦，效能好）*/\ntransition:\n  background-color 0.2s ease,\n  transform        0.15s ease,\n  box-shadow       0.2s ease,\n  opacity          0.2s ease;\n\n/* 偷懶版 */\ntransition: all 0.2s ease;\n\n/* 時間函數 */\n/* ease-out     快進慢出（自然感）★推薦★ */\n/* ease-in-out  慢進慢出（對話框）*/\n/* linear       等速（旋轉動畫）*/",
+    tags:["transition","ease","timing-function"],
+    keys:["transition","動畫","hover","過渡","ease","互動","smooth","流暢","animation"] },
+
+  { id:61, section:"✨ Hover 效果", accent:"#ED93B1", badgeBg:"#FBEAF0", badgeColor:"#72243E",
+    title:"transform（位移、縮放、旋轉）",
+    desc:"不影響排版流的視覺變形，GPU 加速效能最好。hover 微互動首選，可組合多個效果。",
+    code:"transform: translateY(-4px);          /* 上移 */\ntransform: scale(1.05);               /* 放大 */\ntransform: rotate(180deg);            /* 旋轉 */\ntransform: translateY(-2px) scale(1.02); /* 組合 */\ntransform: translate(-50%, -50%);     /* 置中定位 */",
+    tags:["transform","translateY","scale","rotate"],
+    keys:["transform","translate","scale","rotate","動畫","hover","位移","縮放","旋轉","translateY"] },
+
+  { id:62, section:"✨ Hover 效果", accent:"#ED93B1", badgeBg:"#FBEAF0", badgeColor:"#72243E",
+    title:"@keyframes 動畫",
+    desc:"定義完整動畫序列，用在入場動畫、loading 等效果。animation-delay 做錯開入場效果。",
+    code:"@keyframes fadeInUp {\n  from { opacity: 0; transform: translateY(20px); }\n  to   { opacity: 1; transform: translateY(0); }\n}\n.card {\n  animation: fadeInUp 0.4s ease forwards;\n}\n\n/* 多張卡片錯開入場 */\n.card:nth-child(1) { animation-delay: 0s; }\n.card:nth-child(2) { animation-delay: 0.1s; }\n.card:nth-child(3) { animation-delay: 0.2s; }",
+    tags:["keyframes","animation","fadeInUp","animation-delay"],
+    keys:["keyframe","animation","動畫","fadeIn","入場","opacity","delay","stagger","錯開"] },
+
+  { id:63, section:"✨ Hover 效果", accent:"#ED93B1", badgeBg:"#FBEAF0", badgeColor:"#72243E",
+    title:"骨架屏 Skeleton Loading",
+    desc:"內容載入前顯示佔位符，比 spinner 體驗更好，讓使用者感知到頁面結構。shimmer 動畫增加質感。",
+    code:"@keyframes shimmer {\n  from { background-position: -200% 0; }\n  to   { background-position:  200% 0; }\n}\n.skeleton {\n  border-radius: 6px;\n  background: linear-gradient(\n    90deg,\n    #EEEDE9 25%, #E2DFD5 50%, #EEEDE9 75%\n  );\n  background-size: 200% 100%;\n  animation: shimmer 1.5s infinite;\n}",
+    tags:["skeleton","shimmer","loading","placeholder"],
+    keys:["骨架屏","skeleton","shimmer","loading","placeholder","動畫","載入","閃爍"] },
+
+  // 📦 容器設定
+  { id:70, section:"📦 容器設定", accent:"#639922", badgeBg:"#EAF3DE", badgeColor:"#27500A",
+    title:"position: relative / absolute",
+    desc:"absolute 定位的參考點是最近的 non-static 祖先元素。常見錯誤：忘記幫父層加 position: relative。",
+    code:".parent {\n  position: relative; /* 建立定位參考點 */\n}\n.badge {\n  position: absolute;\n  top: -8px;\n  right: -8px;\n}\n\n/* 絕對置中 */\n.centered {\n  position: absolute;\n  top: 50%; left: 50%;\n  transform: translate(-50%, -50%);\n}",
+    warn:{type:"warn", text:"⚠️ 最常見 bug：absolute 子元素跑到意想不到的地方 → 確認父層有 position: relative"},
+    tags:["position","absolute","relative","定位"],
+    keys:["position","absolute","relative","定位","容器","badge","偏移","跑位"] },
+
+  { id:71, section:"📦 容器設定", accent:"#639922", badgeBg:"#EAF3DE", badgeColor:"#27500A",
+    title:"position: fixed & sticky",
+    desc:"fixed 相對視口固定（不隨頁面滾動），sticky 隨頁面滾動直到觸碰邊界後固定，常用於 navbar。",
+    code:"/* 固定在視口 */\n.navbar {\n  position: fixed;\n  top: 0; left: 0; right: 0;\n  z-index: 100;\n  background: white;\n}\n\n/* 滾動到頂部時黏住 */\n.sidebar {\n  position: sticky;\n  top: 20px;\n  align-self: flex-start; /* Grid/Flex 中需要加 */\n}",
+    tags:["fixed","sticky","navbar","position"],
+    keys:["fixed","sticky","navbar","導覽列","置頂","黏住","scroll","固定","position"] },
+
+  { id:72, section:"📦 容器設定", accent:"#639922", badgeBg:"#EAF3DE", badgeColor:"#27500A",
+    title:"z-index（圖層堆疊）",
+    desc:"數值越大越上層，只對非 static 元素有效。建議用 CSS 變數統一管理層級，避免 z-index 大戰。",
+    code:":root {\n  --z-base:     1;\n  --z-dropdown: 100;\n  --z-sticky:   200;\n  --z-overlay:  300;\n  --z-modal:    400;\n  --z-toast:    500;\n  --z-tooltip:  600;\n}\n\n.modal   { position: fixed; z-index: var(--z-modal); }\n.tooltip { position: absolute; z-index: var(--z-tooltip); }",
+    warn:{type:"warn", text:"⚠️ z-index 不生效？確認元素有設定 position（不能是預設 static）"},
+    tags:["z-index","圖層","stacking","modal"],
+    keys:["z-index","圖層","堆疊","modal","overlay","tooltip","zindex","層級","不生效"] },
+
+  { id:73, section:"📦 容器設定", accent:"#639922", badgeBg:"#EAF3DE", badgeColor:"#27500A",
+    title:"overflow（內容溢出處理）",
+    desc:"控制內容超出容器時的顯示方式。auto 最安全（需要時才出現滾動條），hidden 配合 border-radius 用。",
+    code:"overflow: visible; /* 溢出顯示（預設）*/\noverflow: hidden;  /* 裁切，配合 border-radius */\noverflow: auto;    /* 需要時才出現滾動條 ✅ */\noverflow: scroll;  /* 永遠顯示滾動條 */\n\n/* 只控制單一方向 */\noverflow-x: auto;  /* 水平滾動（程式碼區塊）*/\noverflow-y: hidden;/* 垂直裁切 */",
+    tags:["overflow","scroll","hidden","auto"],
+    keys:["overflow","捲動","scroll","hidden","裁切","溢出","滾動條","超出"] },
+
+  // 🧩 Grid 佈局
+  { id:80, section:"🧩 Grid 佈局", accent:"#888780", badgeBg:"#F1EFE8", badgeColor:"#2C2C2A",
+    title:"repeat(auto-fit, minmax()) 響應式黃金公式",
+    desc:"自動根據容器寬度決定欄數，不需要 media query。minmax(280px, 1fr) 意思：最小 280px，最大填滿。",
+    code:".grid {\n  display: grid;\n  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));\n  gap: 24px;\n}\n/* > 840px → 3欄，560~840px → 2欄，< 560px → 1欄 */\n\n/* 固定欄數版本 */\n.grid-3 { grid-template-columns: repeat(3, 1fr); }\n.grid-4 { grid-template-columns: repeat(4, 1fr); }",
+    warn:{type:"rec", text:"✅ 最常用的響應式布局公式，幾乎可以取代大部分 media query"},
+    tags:["grid","auto-fit","minmax","responsive"],
+    keys:["grid","responsive","自動","auto-fit","minmax","響應式","欄位","自動換行","列表"] },
+
+  { id:81, section:"🧩 Grid 佈局", accent:"#888780", badgeBg:"#F1EFE8", badgeColor:"#2C2C2A",
+    title:"grid-template-areas（視覺化布局）",
+    desc:"用文字描述頁面區塊配置，讓布局代碼更直觀易讀，是複雜頁面布局的好工具。",
+    code:".page {\n  display: grid;\n  grid-template-areas:\n    \"header header\"\n    \"sidebar main\"\n    \"footer footer\";\n  grid-template-columns: 240px 1fr;\n  grid-template-rows: auto 1fr auto;\n  min-height: 100vh;\n}\n.header  { grid-area: header; }\n.sidebar { grid-area: sidebar; }\n.main    { grid-area: main; }\n.footer  { grid-area: footer; }",
+    tags:["grid-template-areas","grid-area","layout"],
+    keys:["grid","layout","頁面","sidebar","header","footer","template-areas","版面","整體"] },
+
+  { id:82, section:"🧩 Grid 佈局", accent:"#888780", badgeBg:"#F1EFE8", badgeColor:"#2C2C2A",
+    title:"grid-column / grid-row（跨欄）",
+    desc:"讓特定子元素跨越多欄或多列，常用於儀表板大卡片、首圖特色區塊。",
+    code:"/* 跨越 2 欄 */\n.featured { grid-column: span 2; }\n\n/* 跨越全部欄（banner）*/\n.banner { grid-column: 1 / -1; }\n\n/* 精確指定 */\n.wide {\n  grid-column: 1 / 3;\n  grid-row: 1 / 3;\n}",
+    tags:["grid-column","span","跨欄","grid-row"],
+    keys:["grid","span","跨欄","column","row","佈局","dashboard","banner","特色","合併"] },
+
+  // 🎨 CSS 變數
+  { id:90, section:"🎨 CSS 變數", accent:"#7F77DD", badgeBg:"#EEEDFE", badgeColor:"#3C3489",
+    title:"CSS Custom Properties（自訂變數）",
+    desc:"把顏色、間距、圓角等重複數值抽成變數，修改一處全域生效。對應 Figma 的 Design Token 概念。",
+    code:":root {\n  --color-primary: #7F77DD;\n  --color-text:    #33322E;\n  --color-bg:      #F0EEE8;\n  --radius-sm: 6px; --radius-md: 12px; --radius-lg: 16px;\n  --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);\n  --shadow-md: 0 4px 20px rgba(0,0,0,0.1);\n}\n\n.card {\n  border-radius: var(--radius-lg);\n  box-shadow: var(--shadow-md);\n}",
+    warn:{type:"tip", text:"💡 var(--variable, fallback) 第二個參數是找不到變數時的預設值"},
+    tags:["CSS變數","custom properties","design token"],
+    keys:["變數","variable","token","css","root","custom","figma","design token","主題","統一"] },
+
+  { id:91, section:"🎨 CSS 變數", accent:"#7F77DD", badgeBg:"#EEEDFE", badgeColor:"#3C3489",
+    title:"Dark Mode 深色模式",
+    desc:"prefers-color-scheme 自動偵測系統深色模式，用 CSS 變數覆寫顏色即可，不需要額外 class。",
+    code:":root {\n  --bg:      #FFFFFF;\n  --text:    #1A1A1A;\n  --border:  #E2DFD5;\n  --card-bg: #F9F9F7;\n}\n\n@media (prefers-color-scheme: dark) {\n  :root {\n    --bg:      #1A1A1A;\n    --text:    #F0F0EE;\n    --border:  #333330;\n    --card-bg: #242422;\n  }\n}\n\nbody { background: var(--bg); color: var(--text); }",
+    tags:["dark mode","prefers-color-scheme","深色模式"],
+    keys:["dark mode","深色","dark","prefers-color-scheme","主題","theme","系統","自動"] },
+
+  // 📱 響應式設計
+  { id:100, section:"📱 響應式設計", accent:"#378ADD", badgeBg:"#E6F1FB", badgeColor:"#0C447C",
+    title:"Media Query 斷點",
+    desc:"根據螢幕寬度套用不同樣式。Mobile First 原則：先寫手機版，再用 min-width 擴展到桌面版。",
+    code:"/* ✅ Mobile First（推薦）*/\n.container { padding: 0 16px; } /* 手機基礎 */\n\n@media (min-width: 768px) {  /* 平板 */\n  .container { padding: 0 32px; }\n  .grid { grid-template-columns: repeat(2, 1fr); }\n}\n\n@media (min-width: 1024px) { /* 桌面 */\n  .container { padding: 0 40px; }\n  .grid { grid-template-columns: repeat(3, 1fr); }\n}",
+    warn:{type:"tip", text:"💡 常用斷點：480px 手機橫向 / 768px 平板 / 1024px 桌面 / 1280px 寬螢幕"},
+    tags:["media query","breakpoint","responsive","mobile first"],
+    keys:["media query","斷點","breakpoint","responsive","響應式","手機","平板","桌面","mobile first","768"] },
+
+  { id:101, section:"📱 響應式設計", accent:"#378ADD", badgeBg:"#E6F1FB", badgeColor:"#0C447C",
+    title:"clamp()（流動字體 / 間距）",
+    desc:"讓字體大小在最小值和最大值之間根據視口寬度自動縮放，不需要 media query 就能做響應式字型。",
+    code:"/* clamp(最小值, 偏好值, 最大值) */\n.hero-title {\n  font-size: clamp(1.5rem, 5vw, 3rem);\n  /* 手機：1.5rem，桌面：3rem，中間平滑縮放 */\n}\n\n/* 也可以用在 padding */\n.section {\n  padding: clamp(40px, 8vw, 100px) 0;\n}",
+    tags:["clamp","vw","fluid typography","responsive"],
+    keys:["clamp","vw","流動","字體","響應式","字型","fluid","縮放","自動","平滑"] },
+
+  { id:102, section:"📱 響應式設計", accent:"#378ADD", badgeBg:"#E6F1FB", badgeColor:"#0C447C",
+    title:"手機版 / 桌面版顯示控制",
+    desc:"用 media query 控制元素在不同裝置的顯示與隱藏，是響應式設計最常見的需求之一。",
+    code:"/* 手機上隱藏 */\n.desktop-only { display: none; }\n@media (min-width: 768px) {\n  .desktop-only { display: block; }\n}\n\n/* 桌面上隱藏 */\n.mobile-only { display: block; }\n@media (min-width: 768px) {\n  .mobile-only { display: none; }\n}",
+    tags:["display:none","responsive","隱藏","mobile-only"],
+    keys:["隱藏","display none","responsive","手機","桌面","顯示","mobile-only","desktop-only"] },
+
+  // 🔧 DevTools 除錯
+  { id:110, section:"🔧 DevTools 除錯", accent:"#E24B4A", badgeBg:"#FCEBEB", badgeColor:"#501313",
+    title:"outline 除錯法（看版面結構）",
+    desc:"用 outline 幫所有元素加外框，因為 outline 不佔空間不影響排版，是最快找出版面問題的方法。",
+    code:"/* 貼到 DevTools Console 執行 */\ndocument.querySelectorAll('*').forEach(el => {\n  el.style.outline = '1px solid red';\n});\n\n/* 或暫時加到 CSS */\n* { outline: 1px solid red; }\n\n/* 不同層用不同顏色 */\ndiv { outline: 1px solid red; }\nsection { outline: 1px solid blue; }",
+    warn:{type:"tip", text:"💡 outline 不佔空間（不像 border），加了不會破壞原本排版"},
+    tags:["outline","debug","除錯","DevTools"],
+    keys:["除錯","debug","outline","devtools","版面","結構","紅框","診斷"] },
+
+  { id:111, section:"🔧 DevTools 除錯", accent:"#E24B4A", badgeBg:"#FCEBEB", badgeColor:"#501313",
+    title:"常見排版 Bug 速查",
+    desc:"最高頻率的 CSS 問題與解法，碰到問題先查這裡。",
+    code:"/* 🐛 圖片底部神秘空白 */\nimg { display: block; }\n\n/* 🐛 inline-block 之間有間距 */\n.parent { display: flex; } /* 改用 flex 解決 */\n\n/* 🐛 margin 合併（上下 margin 合併）*/\n.parent { overflow: hidden; } /* 觸發 BFC */\n\n/* 🐛 100% 高度不生效 */\nhtml, body { height: 100%; } /* 祖先鏈都要設 */\n\n/* 🐛 flex 子元素寬度被撐開 */\n.child { min-width: 0; }",
+    tags:["bug","神秘空白","margin合併","BFC","除錯"],
+    keys:["bug","除錯","空白","margin","合併","BFC","高度","100%","inline-block","間距","被撐開"] },
+
+  { id:112, section:"🔧 DevTools 除錯", accent:"#E24B4A", badgeBg:"#FCEBEB", badgeColor:"#501313",
+    title:"CSS 選擇器優先級（Specificity）",
+    desc:"樣式不生效通常是優先級衝突。了解優先級規則，不要濫用 !important。",
+    code:"/* 優先級由低到高 */\n*    {}  /* 0,0,0,0 全域 */\ndiv  {}  /* 0,0,0,1 元素 */\n.cls {}  /* 0,0,1,0 class ★ 最常用 */\n#id  {}  /* 0,1,0,0 ID（避免用）*/\n         /* 1,0,0,0 行內 style */\n         /* 核彈   !important */\n\n/* 安全提高優先級 */\n.parent .child {}   /* 比 .child 更強 */\n.card.is-active {}  /* 雙 class 連寫 */",
+    warn:{type:"warn", text:"⚠️ 樣式不生效？先查是不是被更高優先級的選擇器蓋掉了"},
+    tags:["specificity","優先級","!important","選擇器"],
+    keys:["優先級","specificity","選擇器","!important","class","id","樣式不生效","覆蓋","蓋掉"] },
+];
+
+/* ====== STATE ====== */
+let query = "";
+let sortMode = "relevance";
+
+function setSort(mode) {
+  sortMode = mode;
+  document.getElementById('sortRelevance').classList.toggle('active', mode==='relevance');
+  document.getElementById('sortCategory').classList.toggle('active', mode==='category');
+  render();
+}
+
+/* ====== SEARCH ENGINE ====== */
+function score(item, q) {
+  if (!q) return 1;
+  const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
+  let s = 0;
+  for (const t of terms) {
+    if (item.title.toLowerCase().includes(t))  s += 10;
+    if (item.desc.toLowerCase().includes(t))   s += 5;
+    if (item.code.toLowerCase().includes(t))   s += 4;
+    if (item.tags.some(g => g.toLowerCase().includes(t))) s += 7;
+    if (item.keys.some(k => k.toLowerCase().includes(t))) s += 8;
+    if (item.section.toLowerCase().includes(t)) s += 3;
+    if (item.warn && item.warn.text.toLowerCase().includes(t)) s += 2;
+  }
+  return s;
+}
+
+function highlight(text, q) {
+  if (!q) return text;
+  const terms = q.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  let r = text;
+  for (const t of terms) {
+    const e = t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    r = r.replace(new RegExp(`(${e})`,'gi'),'<mark>$1</mark>');
+  }
+  return r;
+}
+
+function search() {
+  const q = query.trim();
+  let res = DATA.map(item => ({...item, _s: score(item,q)})).filter(i => !q || i._s > 0);
+  if (sortMode==='relevance' && q) res.sort((a,b)=>b._s-a._s);
+  else res.sort((a,b)=>a.id-b.id);
+  return res;
+}
+
+/* ====== RENDER ====== */
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function render() {
+  const q = query.trim();
+  const res = search();
+  const el = document.getElementById('results');
+  const ct = document.getElementById('resultCount');
+
+  ct.innerHTML = !q
+    ? `共 <strong>${DATA.length}</strong> 個屬性 — 輸入關鍵字或用中文描述問題`
+    : res.length > 0
+      ? `找到 <strong>${res.length}</strong> 個結果`
+      : `找不到「<strong>${esc(q)}</strong>」的結果`;
+
+  if (!res.length && q) {
+    el.innerHTML = `<div class="empty-state"><div class="emoji">🤔</div><p>找不到 <span>${esc(q)}</span> 的相關結果</p><p style="margin-top:8px;font-size:0.85rem;color:#aaa">試試換個說法，或點上方快速標籤瀏覽</p></div>`;
+    return;
+  }
+
+  el.innerHTML = res.map(item => {
+    const w = item.warn ? `<div class="warn-box type-${item.warn.type}">${item.warn.text}</div>` : '';
+    return `<div class="result-card" style="--card-accent:${item.accent}">
+      <div class="card-top">
+        <div style="min-width:0">
+          <div class="card-title">${highlight(esc(item.title),q)}</div>
+          <div class="card-desc">${highlight(esc(item.desc),q)}</div>
+        </div>
+        <span class="card-section-badge" style="background:${item.badgeBg};color:${item.badgeColor}">${item.section}</span>
+      </div>
+      ${w}
+      <div class="code-preview" onclick="copyCode(this,event)">
+${highlight(esc(item.code),q)}<span class="copy-hint">點擊複製</span></div>
+      <div class="card-tags">${item.tags.map(t=>`<span class="card-tag">${highlight(esc(t),q)}</span>`).join('')}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ====== COPY ====== */
+function copyCode(el,e) {
+  if(e) e.stopPropagation();
+  const text = el.innerText.replace(/點擊複製$/,'').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    const h = el.querySelector('.copy-hint');
+    if(h){ h.textContent='✅ 已複製'; h.classList.add('copied'); setTimeout(()=>{ h.textContent='點擊複製'; h.classList.remove('copied'); },1800); }
+    const t = document.getElementById('toast');
+    t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000);
+  });
+}
+
+/* ====== EVENTS ====== */
+const input = document.getElementById('searchInput');
+const clrBtn = document.getElementById('clearBtn');
+
+input.addEventListener('input', () => {
+  query = input.value;
+  clrBtn.classList.toggle('visible', query.length>0);
+  document.querySelectorAll('.quick-tag').forEach(t=>t.classList.remove('active'));
+  render();
+});
+
+clrBtn.addEventListener('click', () => {
+  input.value=''; query=''; clrBtn.classList.remove('visible');
+  document.querySelectorAll('.quick-tag').forEach(t=>t.classList.remove('active'));
+  input.focus(); render();
+});
+
+document.querySelectorAll('.quick-tag').forEach(tag => {
+  tag.addEventListener('click', () => {
+    const q = tag.dataset.query;
+    const active = tag.classList.contains('active');
+    document.querySelectorAll('.quick-tag').forEach(t=>t.classList.remove('active'));
+    if(active){ input.value=''; query=''; clrBtn.classList.remove('visible'); }
+    else { tag.classList.add('active'); input.value=q; query=q; clrBtn.classList.add('visible'); }
+    render();
+  });
+});
+
+document.addEventListener('keydown', e => {
+  if(e.key==='/' && document.activeElement!==input){ e.preventDefault(); input.focus(); input.select(); }
+  if(e.key==='Escape') input.blur();
+});
+
+render();
+</script>
+</body>
+</html>
